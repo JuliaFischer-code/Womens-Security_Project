@@ -1,2 +1,30 @@
 fullname = ("Júlia Fischer")
 print(fullname)
+
+
+TEST:
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)  # Enable CORS to allow frontend requests from different origins
+
+# Temporary in-memory storage for user data
+users = []
+
+@app.route("/api/users", methods=["POST"])
+def add_user():
+    data = request.get_json()
+    name = data.get("name")
+    age = data.get("age")
+    gender = data.get("gender")
+    location = data.get("location")
+
+    if name and age and gender and location:
+        users.append({"name": name, "age": age, "gender": gender, "location": location})
+        return jsonify({"message": "User data saved successfully"}), 200
+    else:
+        return jsonify({"message": "Invalid data format"}), 400
+
+if __name__ == "__main__":
+    app.run(debug=True)
