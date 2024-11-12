@@ -1,2 +1,2 @@
-name= ("Júlia Fischer")
+name = ("Júlia Fischer")
 print(name)
