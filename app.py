@@ -13,11 +13,10 @@ def call():
 @app.route("/chat")
 def chat():
     return render_template("chat.html")
-#lll
 
 @app.route("/sos")
 def sos():
     return render_template("sos.html")
 
 if __name__ == "__main__":
-    app.run(debug=True, port=5001)
+    app.run(host='0.0.0.0', port=5001)
