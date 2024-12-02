@@ -13,6 +13,7 @@ def call():
 @app.route("/chat")
 def chat():
     return render_template("chat.html")
+#lll
 
 @app.route("/sos")
 def sos():
