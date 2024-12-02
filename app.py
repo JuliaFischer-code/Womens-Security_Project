@@ -1,10 +1,12 @@
+import os
 from flask import Flask, render_template, request, jsonify
-import openai
+import requests
 
 app = Flask(__name__)
 
-# OpenAI API setup
-openai.api_key = "test_PxwJS4GEn74VXi7wJ5Oi0vvQxnE0eU52thQwviL0"
+# XAI API setup
+XAI_API_KEY = "xai-GzNVUttSmeDYf1Jo9Q2LJt1795nza5A98uXMeJocBehHTbUa26rbZAdbZSDROTO3EZPnCEsHlKAVIyDY"
+XAI_BASE_URL = "https://api.x.ai/v1"  # XAI API base URL
 
 @app.route("/")
 def index():
@@ -30,19 +32,31 @@ def api_chat():
         return jsonify({"error": "Message cannot be empty"}), 400
 
     try:
-        # Make the API call to OpenAI
-        response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Specify the model
-            messages=[
-                {"role": "system", "content": "You are a helpful and friendly chatbot."},
-                {"role": "user", "content": user_message},
-            ],
+        # Make the API call to XAI
+        response = requests.post(
+            f"{XAI_BASE_URL}/chat/completions",  # XAI's chat completion endpoint
+            headers={
+                "Authorization": f"Bearer {XAI_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "grok-beta",  # Example model, replace with the actual model name if necessary
+                "messages": [
+                    {"role": "system", "content": "You are Grok, a chatbot inspired by the Hitchhiker's Guide to the Galaxy."},
+                    {"role": "user", "content": user_message},
+                ],
+            }
         )
-        # Extract the chatbot's response
-        chatbot_response = response['choices'][0]['message']['content']
-        return jsonify({"response": chatbot_response})
+
+        # Handle the response from XAI API
+        if response.status_code == 200:
+            data = response.json()
+            chatbot_response = data['choices'][0]['message']['content']
+            return jsonify({"response": chatbot_response})
+        else:
+            return jsonify({"error": f"Error: {response.status_code}, {response.text}"}), 500
+
     except Exception as e:
-        # Handle errors gracefully
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
