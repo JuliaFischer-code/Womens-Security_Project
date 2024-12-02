@@ -16,7 +16,7 @@ def chat():
 
 @app.route("/sos")
 def sos():
-    return render_template("sos.html")
+    return render_template("sos.html") #TESTTEST
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=5001)
