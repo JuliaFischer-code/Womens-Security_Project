@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Women's Security App</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1, p {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        #button-container {
+            display: flex;
+            gap: 20px; /* Increased gap for more separation */
+            margin: 20px 0; /* More space above and below the button container */
+        }
+
+        button {
+            width: 100px; /* Increased size for better visibility */
+            height: 100px; /* Increased size for better visibility */
+            border: none;
+            border-radius: 50%;
+            font-size: 30px; /* Larger font size for emoji visibility */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Stronger shadow for prominence */
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease; /* Smooth hover effect */
+        }
+
+        button:hover {
+            transform: scale(1.1); /* Slightly enlarge button on hover */
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3); /* Stronger shadow on hover */
+        }
+
+        button.call {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        button.chat {
+            background-color: #2196F3;
+            color: white;
+        }
+
+        button.sos {
+            background-color: #F44336;
+            color: white;
+        }
+
+        #searchBar {
+            width: 80%;
+            max-width: 500px;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        #map {
+            width: 90%;
+            height: 400px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Feel Safe, Stay Connected</h1>
+    <p>Making your journeys safer, one step at a time</p>
+
+    <div id="button-container">
+        <!-- Link each button to the Flask routes -->
+        <a href="/call">
+            <button class="call">📞</button>
+        </a>
+        <a href="/chat">
+            <button class="chat">💬</button>
+        </a>
+        <a href="/sos">
+            <button class="sos">🔔</button>
+        </a>
+    </div>
+
+    <form>
+        <input type="text" id="searchBar" placeholder="Search for a location...">
+    </form>
+
+    <div id="map"></div>
+
+    <script>
+        // Initialize map
+        var map = L.map('map').setView([49.1427, 9.2109], 13); // Coordinates for Heilbronn, Germany
+
+        // Add OpenStreetMap tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Add a marker to the initial location
+        L.marker([49.1427, 9.2109]).addTo(map)
+            .bindPopup("<b>Welcome to Heilbronn!</b><br>Stay safe and secure.")
+            .openPopup();
+
+        // Handle search bar input
+        document.getElementById('searchBar').addEventListener('input', function() {
+            var query = document.getElementById('searchBar').value;
+            var url = `https://nominatim.openstreetmap.org/search?q=${query}&format=json`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length > 0) {
+                        var lat = data[0].lat;
+                        var lon = data[0].lon;
+
+                        map.setView([lat, lon], 13);
+
+                        L.marker([lat, lon]).addTo(map)
+                            .bindPopup(`<b>${data[0].display_name}</b>`)
+                            .openPopup();
+                    }
+                })
+                .catch(err => console.log(err));
+        });
+    </script>
+</body>
+</html>
