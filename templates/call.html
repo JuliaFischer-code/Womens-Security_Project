@@ -3,16 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Call</title>
+    <title>Emergency Contacts</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .contact-list {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .contact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+        .contact:last-child {
+            border-bottom: none;
+        }
+        .contact button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px; 
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .contact button:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
-    <h1>Emergency Call Options</h1>
-    <ul>
-        <li>📞 First Preference Emergency Contact</li>
-        <li>📞 Second Preference Emergency Contact</li>
-        <li>📞 Third Preference Emergency Contact</li>
-        <li>📞 Police</li>
-    </ul>
-    <a href="/">Back to Home</a>
+    <h1>Emergency Contacts</h1>
+    <p>Select a contact to call. You will be asked to confirm before proceeding.</p>
+    <div class="contact-list">
+        <div class="contact">
+            <span>Ambulance</span>
+            <button onclick="confirmCall('112')">Call</button>
+        </div>
+        <div class="contact">
+            <span>Police</span>
+            <button onclick="confirmCall('110')">Call</button>
+        </div>
+        <div class="contact">
+            <span>Way Home Phone</span>
+            <button onclick="confirmCall('03012074182')">Call</button>
+        </div>
+    </div>
+
+    <script>
+        function confirmCall(phoneNumber) {
+            const confirmAction = confirm(`Do you really want to call ${phoneNumber}?`);
+            if (confirmAction) {
+                window.location.href = `tel:${phoneNumber}`;
+            }
+        }
+    </script>
 </body>
 </html>
