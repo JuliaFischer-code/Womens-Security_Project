@@ -54,6 +54,10 @@
             border-radius: 0 5px 5px 0;
             cursor: pointer;
         }
+        .chat-form button.record {
+            background-color: red;
+            margin-left: 10px;
+        }
     </style>
 </head>
 <body>
@@ -62,12 +66,14 @@
         <form id="chat-form" class="chat-form">
             <input type="text" id="user-input" placeholder="Type your message..." required>
             <button type="submit">Send</button>
+            <button type="button" id="record-button" class="record">🎤</button>
         </form>
     </div>
 
     <script>
         const form = document.getElementById("chat-form");
         const chatLog = document.getElementById("chat-log");
+        const recordButton = document.getElementById("record-button");
 
         form.addEventListener("submit", async (event) => {
             event.preventDefault();
@@ -99,6 +105,12 @@
                     botMessage.className = "chat-message bot-message";
                     botMessage.textContent = data.response;
                     chatLog.appendChild(botMessage);
+
+                    // Play audio response
+                    if (data.audio_url) {
+                        const audio = new Audio(data.audio_url);
+                        audio.play();
+                    }
                 } else {
                     alert("Error: " + (data.error || "Unknown error occurred."));
                 }
@@ -109,6 +121,23 @@
             } catch (err) {
                 alert("Error communicating with the chatbot.");
             }
+        });
+
+        // Voice recording functionality
+        recordButton.addEventListener("click", () => {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "en-US";
+
+            recognition.start();
+
+            recognition.onresult = function(event) {
+                const speechResult = event.results[0][0].transcript;
+                document.getElementById("user-input").value = speechResult;
+            };
+
+            recognition.onerror = function(event) {
+                console.error("Error during speech recognition:", event.error);
+            };
         });
     </script>
 </body>
