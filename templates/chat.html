@@ -8,60 +8,142 @@
         body {
             font-family: Arial, sans-serif;
             margin: 0;
-            padding: 20px;
+            padding: 0;
             background-color: #f5f5f5;
         }
         .chat-container {
             max-width: 600px;
-            margin: 0 auto;
+            margin: 50px auto;
             background: white;
             border: 1px solid #ddd;
-            border-radius: 5px;
-            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
-        .chat-log {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-bottom: 10px;
+        .chat-header {
+            background-color: #00008b;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+        .quick-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .quick-buttons button {
             padding: 10px;
             border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-align: left;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+        .quick-buttons button.green {
+            background-color: #e6f4e6;
+            color: #155724;
+        }
+        .quick-buttons button.green:hover {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .quick-buttons button.yellow {
+            background-color: #fff5e6;
+            color: #856404;
+        }
+        .quick-buttons button.yellow:hover {
+            background-color: #ffeeba;
+            border-color: #ffe8a1;
+        }
+        .quick-buttons button.red {
+            background-color: #fdecea;
+            color: #721c24;
+        }
+        .quick-buttons button.red:hover {
+            background-color: #f5c6cb;
+            border-color: #f1b0b7;
+        }
+        .chat-log {
+            height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         .chat-message {
-            margin: 5px 0;
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            line-height: 1.5;
         }
         .user-message {
+            background-color: #d1e7ff;
+            color: #004085;
+            align-self: flex-end;
             text-align: right;
-            color: blue;
         }
         .bot-message {
+            background-color: #d4edda;
+            color: #155724;
+            align-self: flex-start;
             text-align: left;
-            color: green;
         }
         .chat-form {
             display: flex;
+            align-items: center;
+            padding: 10px;
+            border-top: 1px solid #ddd;
+            gap: 10px;
         }
         .chat-form input {
             flex: 1;
-            padding: 10px;
+            padding: 15px;
             border: 1px solid #ddd;
-            border-radius: 5px 0 0 5px;
+            border-radius: 5px;
+            font-size: 1em;
         }
         .chat-form button {
-            padding: 10px;
+            padding: 10px 20px;
             border: none;
-            background-color: blue;
-            color: white;
-            border-radius: 0 5px 5px 0;
+            border-radius: 5px;
+            font-size: 1em;
             cursor: pointer;
+        }
+        .chat-form button[type="submit"] {
+            background-color: #00008b;
+            color: white;
         }
         .chat-form button.record {
             background-color: red;
-            margin-left: 10px;
+            color: white;
+        }
+        .chat-form button:hover {
+            opacity: 0.9;
         }
     </style>
 </head>
 <body>
     <div class="chat-container">
+        <div class="chat-header">How can I help you?</div>
+        <div class="quick-buttons">
+            <button class="green" data-message="I feel unsafe">I feel unsafe</button>
+            <button class="yellow" data-message="I am being harassed">I am being harassed</button>
+            <button class="red" data-message="Is it safe here?">Is it safe here?</button>
+        </div>
         <div class="chat-log" id="chat-log"></div>
         <form id="chat-form" class="chat-form">
             <input type="text" id="user-input" placeholder="Type your message..." required>
@@ -73,57 +155,105 @@
     <script>
         const form = document.getElementById("chat-form");
         const chatLog = document.getElementById("chat-log");
+        const quickButtons = document.querySelectorAll(".quick-buttons button");
         const recordButton = document.getElementById("record-button");
 
-        form.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const userInput = document.getElementById("user-input").value;
-
-            // Add user's message to the chat log
+        async function sendMessage(userInput) {
             const userMessage = document.createElement("div");
             userMessage.className = "chat-message user-message";
             userMessage.textContent = userInput;
             chatLog.appendChild(userMessage);
 
-            // Clear the input field
-            document.getElementById("user-input").value = "";
-
             try {
-                // Send the message to the server
-                const response = await fetch("/api/chat", {
+                const response = await fetch("/api/call", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({ message: userInput }),
                 });
-                const data = await response.json();
 
-                if (data.response) {
-                    // Display the chatbot's response
+                if (response.ok) {
+                    const data = await response.json();
                     const botMessage = document.createElement("div");
                     botMessage.className = "chat-message bot-message";
                     botMessage.textContent = data.response;
                     chatLog.appendChild(botMessage);
 
-                    // Play audio response
                     if (data.audio_url) {
                         const audio = new Audio(data.audio_url);
                         audio.play();
                     }
+                }
+            } catch (err) {
+                console.error("Error:", err);
+            }
+
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        quickButtons.forEach(button => {
+            button.addEventListener("click", async () => {
+                const message = button.getAttribute("data-message");
+                const userMessage = document.createElement("div");
+                userMessage.className = "chat-message user-message";
+                userMessage.textContent = message;
+                chatLog.appendChild(userMessage);
+
+                if (message === "I feel unsafe") {
+                    const botMessage = document.createElement("div");
+                    botMessage.className = "chat-message bot-message";
+                    botMessage.innerHTML = `
+                        If you feel unsafe, I recommend you to:
+                        <ul>
+                            <li>Go to a safe place</li>
+                            <li>Contact someone close to you</li>
+                            <li>Tell me to call someone</li>
+                        </ul>
+                    `;
+                    chatLog.appendChild(botMessage);
+                } else if (message === "I am being harassed") {
+                    const botMessage = document.createElement("div");
+                    botMessage.className = "chat-message bot-message";
+                    botMessage.innerHTML = `
+                        If you are being harassed, you should:
+                        <ul>
+                            <li>Move to a safe and public location</li>
+                            <li>Seek assistance from nearby authorities or people</li>
+                            <li>Document the incident if safe to do so</li>
+                        </ul>
+                    `;
+                    chatLog.appendChild(botMessage);
+                } else if (message === "Is it safe here?") {
+                    const botMessage = document.createElement("div");
+                    botMessage.className = "chat-message bot-message";
+                    botMessage.innerHTML = `
+                        Safety can depend on the situation. You might want to:
+                        <ul>
+                            <li>Check for nearby exits</li>
+                            <li>Stay alert to your surroundings</li>
+                            <li>Ask someone you trust for advice</li>
+                        </ul>
+                    `;
+                    chatLog.appendChild(botMessage);
                 } else {
-                    alert("Error: " + (data.error || "Unknown error occurred."));
+                    await sendMessage(message);
                 }
 
-                // Scroll to the bottom of the chat log
                 chatLog.scrollTop = chatLog.scrollHeight;
+            });
+        });
 
-            } catch (err) {
-                alert("Error communicating with the chatbot.");
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const userInput = document.getElementById("user-input").value.trim();
+
+            if (userInput) {
+                sendMessage(userInput);
+                document.getElementById("user-input").value = "";
             }
         });
 
-        // Voice recording functionality
         recordButton.addEventListener("click", () => {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = "en-US";
@@ -132,7 +262,9 @@
 
             recognition.onresult = function(event) {
                 const speechResult = event.results[0][0].transcript;
-                document.getElementById("user-input").value = speechResult;
+
+                // Send the recognized speech directly to the chatbot without adding it again in the input field
+                sendMessage(speechResult);
             };
 
             recognition.onerror = function(event) {
