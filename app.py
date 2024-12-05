@@ -1,11 +1,7 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, send_from_directory
 import requests
 import os
-import speech_recognition as sr
 from gtts import gTTS
-from pydub import AudioSegment
-from pydub.playback import play
-import tempfile
 
 app = Flask(__name__)
 
@@ -13,29 +9,20 @@ app = Flask(__name__)
 XAI_API_KEY = "xai-GzNVUttSmeDYf1Jo9Q2LJt1795nza5A98uXMeJocBehHTbUa26rbZAdbZSDROTO3EZPnCEsHlKAVIyDY"
 XAI_BASE_URL = "https://api.x.ai/v1"
 
-# Route for the main index page
+# Create a directory to store audio files if it doesn't exist
+AUDIO_FOLDER = "static/audio"
+os.makedirs(AUDIO_FOLDER, exist_ok=True)
+
 @app.route("/")
 def index():
     return render_template("index.html")
 
-# Route for the call page
 @app.route("/call")
 def call():
     return render_template("call.html")
 
-# Route for the chat page
-@app.route("/chat")
-def chat():
-    return render_template("chat.html")
-
-# Route for the SOS page
-@app.route("/sos")
-def sos():
-    return render_template("sos.html")
-
-# API endpoint to handle chat requests
-@app.route("/api/chat", methods=["POST"])
-def api_chat():
+@app.route("/api/call", methods=["POST"])
+def api_call():
     user_message = request.json.get("message")
     if not user_message:
         return jsonify({"error": "Message cannot be empty"}), 400
@@ -63,12 +50,12 @@ def api_chat():
 
             # Convert chatbot response to speech
             tts = gTTS(text=chatbot_response, lang="en")
-            temp_audio_file = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
-            tts.save(temp_audio_file.name)
+            audio_file_path = os.path.join(AUDIO_FOLDER, "response.mp3")
+            tts.save(audio_file_path)
 
             return jsonify({
                 "response": chatbot_response,
-                "audio_url": temp_audio_file.name
+                "audio_url": f"/{audio_file_path}"
             })
         else:
             return jsonify({"error": f"Error: {response.status_code}, {response.text}"}), 500

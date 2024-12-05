@@ -3,16 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Emergency Call</title>
+    <title>Simulated Emergency Call</title>
 </head>
 <body>
-    <h1>Emergency Call Options</h1>
-    <ul>
-        <li>📞 First Preference Emergency Contact</li>
-        <li>📞 Second Preference Emergency Contact</li>
-        <li>📞 Third Preference Emergency Contact</li>
-        <li>📞 Police</li>
-    </ul>
-    <a href="/">Back to Home</a> #TEST2.0IV
+    <h1>Simulated Emergency Call</h1>
+    <div>
+        <button id="record-button">🎤 Speak</button>
+        <p id="user-message"></p>
+        <p><strong>LLM Response:</strong> <span id="llm-response"></span></p>
+        <audio id="response-audio" controls style="display: none;"></audio>
+    </div>
+    <a href="/">Back to Home</a>
+
+    <script src="/static/index.js"></script>
 </body>
 </html>

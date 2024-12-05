@@ -1,32 +1,4 @@
-document.getElementById("sendButton").addEventListener("click", () => {
-    const userMessage = document.getElementById("messageInput").value;
-
-    fetch("/api/chat", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ message: userMessage })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.response) {
-            document.getElementById("chatBox").innerHTML += `<p><strong>Assistant:</strong> ${data.response}</p>`;
-            
-            // Play the audio response
-            if (data.audio_url) {
-                const audio = new Audio(data.audio_url);
-                audio.play();
-            }
-        } else {
-            document.getElementById("chatBox").innerHTML += `<p>Error: ${data.error}</p>`;
-        }
-    })
-    .catch(error => console.error("Error:", error));
-});
-
-// Voice recording functionality
-document.getElementById("recordButton").addEventListener("click", () => {
+document.getElementById("record-button").addEventListener("click", () => {
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = "en-US";
 
@@ -34,10 +6,35 @@ document.getElementById("recordButton").addEventListener("click", () => {
 
     recognition.onresult = function(event) {
         const speechResult = event.results[0][0].transcript;
-        document.getElementById("messageInput").value = speechResult;
+        document.getElementById("user-message").textContent = `You said: "${speechResult}"`;
+
+        // Send the speech text to the server
+        fetch("/api/call", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ message: speechResult }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.response) {
+                // Display the LLM response
+                document.getElementById("llm-response").textContent = data.response;
+
+                // Set and play the audio response automatically
+                const audioElement = document.getElementById("response-audio");
+                audioElement.src = data.audio_url;
+                audioElement.style.display = "block";
+                audioElement.play();
+            } else {
+                alert("Error: " + (data.error || "Unknown error occurred."));
+            }
+        })
+        .catch(error => console.error("Error:", error));
     };
 
     recognition.onerror = function(event) {
-        console.error("Error during speech recognition:", event.error);
+        console.error("Speech recognition error:", event.error);
     };
 });
