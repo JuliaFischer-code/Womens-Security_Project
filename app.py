@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify
 import requests
 import os
 from gtts import gTTS
+import time
 
 app = Flask(__name__)
 
@@ -17,9 +18,53 @@ os.makedirs(AUDIO_FOLDER, exist_ok=True)
 def index():
     return render_template("index.html")
 
+@app.route("/chat")
+def chat():
+    return render_template("chat.html")
+
+@app.route("/sos")
+def sos():
+    return render_template("sos.html")
+
 @app.route("/call")
 def call():
     return render_template("call.html")
+
+@app.route("/api/chat", methods=["POST"])
+def api_chat():
+    user_message = request.json.get("message")
+    if not user_message:
+        return jsonify({"error": "Message cannot be empty"}), 400
+
+    try:
+        # Make the API call to XAI
+        response = requests.post(
+            f"{XAI_BASE_URL}/chat/completions",
+            headers={
+                "Authorization": f"Bearer {XAI_API_KEY}",
+                "Content-Type": "application/json",
+            },
+            json={
+                "model": "grok-beta",
+                "messages": [
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": user_message},
+                ],
+            }
+        )
+
+        if response.status_code == 200:
+            data = response.json()
+            chatbot_response = data['choices'][0]['message']['content']
+
+            return jsonify({
+                "response": chatbot_response
+            })
+        else:
+            return jsonify({"error": f"Error: {response.status_code}, {response.text}"}), 500
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/call", methods=["POST"])
 def api_call():
@@ -49,8 +94,10 @@ def api_call():
             chatbot_response = data['choices'][0]['message']['content']
 
             # Convert chatbot response to speech
+            timestamp = int(time.time())
+            audio_filename = f"response_{timestamp}.mp3"
+            audio_file_path = os.path.join(AUDIO_FOLDER, audio_filename)
             tts = gTTS(text=chatbot_response, lang="en")
-            audio_file_path = os.path.join(AUDIO_FOLDER, "response.mp3")
             tts.save(audio_file_path)
 
             return jsonify({
