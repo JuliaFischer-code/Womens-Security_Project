@@ -1,6 +1,61 @@
-#used for appearence of website
-  body {
-    font-family: fantasy;
-    font-size: 2em;
-  }
-    
+/* General appearance for the website */
+body {
+  font-family: fantasy;
+  font-size: 2em;
+}
+
+/* Styling for the typing indicator */
+#typing-indicator {
+  font-style: italic;
+  color: gray;
+  display: none; /* Hidden by default */
+  text-align: center;
+  margin: 10px 0; /* Adds some spacing */
+  font-size: 1.2em; /* Adjusts size slightly */
+}
+
+/* Styling for the chat buttons */
+.chat-form button.call {
+  background-color: green;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.chat-form button.call:hover {
+  opacity: 0.9;
+}
+
+.chat-form button.record {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.chat-form button.record:hover {
+  opacity: 0.9;
+}
+
+.chat-form button[type="submit"] {
+  background-color: #00008b;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 15px;
+  font-size: 1em;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.chat-form button[type="submit"]:hover {
+  opacity: 0.9;
+}

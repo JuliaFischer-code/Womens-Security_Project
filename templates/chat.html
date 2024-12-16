@@ -50,25 +50,13 @@
             background-color: #e6f4e6;
             color: #155724;
         }
-        .quick-buttons button.green:hover {
-            background-color: #d4edda;
-            border-color: #c3e6cb;
-        }
         .quick-buttons button.yellow {
             background-color: #fff5e6;
             color: #856404;
         }
-        .quick-buttons button.yellow:hover {
-            background-color: #ffeeba;
-            border-color: #ffe8a1;
-        }
         .quick-buttons button.red {
             background-color: #fdecea;
             color: #721c24;
-        }
-        .quick-buttons button.red:hover {
-            background-color: #f5c6cb;
-            border-color: #f1b0b7;
         }
         .chat-log {
             height: 300px;
@@ -117,7 +105,7 @@
             font-size: 1em;
         }
         .chat-form button {
-            padding: 10px 20px;
+            padding: 10px 15px;
             border: none;
             border-radius: 5px;
             font-size: 1em;
@@ -127,12 +115,28 @@
             background-color: #00008b;
             color: white;
         }
+        .chat-form button[type="submit"]:hover {
+            opacity: 0.9;
+        }
         .chat-form button.record {
-            background-color: red;
+            background-color: lightgray;
             color: white;
         }
-        .chat-form button:hover {
+        .chat-form button.call {
+            background-color: rgb(228, 154, 159);
+            color: white;
+        }
+        .chat-form button.record:hover,
+        .chat-form button.call:hover {
             opacity: 0.9;
+        }
+        #typing-indicator {
+            font-style: italic;
+            color: gray;
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+            font-size: 1em;
         }
     </style>
 </head>
@@ -145,24 +149,41 @@
             <button class="red" data-message="Is it safe here?">Is it safe here?</button>
         </div>
         <div class="chat-log" id="chat-log"></div>
+
+        <!-- Typing Indicator -->
+        <div id="typing-indicator">Typing...</div>
+
         <form id="chat-form" class="chat-form">
             <input type="text" id="user-input" placeholder="Type your message..." required>
             <button type="submit">Send</button>
             <button type="button" id="record-button" class="record">🎤</button>
+            <button type="button" id="call-button" class="call">📞</button>
         </form>
     </div>
+    <!-- Back Home Button -->
+    <div style="text-align: center; margin: 20px;">
+        <button onclick="location.href='/';" 
+                style="padding: 10px 20px; font-size: 1em; background-color: #d3d3d3; color: black; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s;">
+            Back to Home
+        </button>
+    </div>
+
 
     <script>
+        // JavaScript logic remains unchanged
         const form = document.getElementById("chat-form");
         const chatLog = document.getElementById("chat-log");
+        const typingIndicator = document.getElementById("typing-indicator");
         const quickButtons = document.querySelectorAll(".quick-buttons button");
-        const recordButton = document.getElementById("record-button");
 
         async function sendMessage(userInput) {
             const userMessage = document.createElement("div");
             userMessage.className = "chat-message user-message";
             userMessage.textContent = userInput;
             chatLog.appendChild(userMessage);
+
+            // Show typing indicator
+            typingIndicator.style.display = "block";
 
             try {
                 const response = await fetch("/api/call", {
@@ -187,62 +208,12 @@
                 }
             } catch (err) {
                 console.error("Error:", err);
-            }
-
-            chatLog.scrollTop = chatLog.scrollHeight;
-        }
-
-        quickButtons.forEach(button => {
-            button.addEventListener("click", async () => {
-                const message = button.getAttribute("data-message");
-                const userMessage = document.createElement("div");
-                userMessage.className = "chat-message user-message";
-                userMessage.textContent = message;
-                chatLog.appendChild(userMessage);
-
-                if (message === "I feel unsafe") {
-                    const botMessage = document.createElement("div");
-                    botMessage.className = "chat-message bot-message";
-                    botMessage.innerHTML = `
-                        If you feel unsafe, I recommend you to:
-                        <ul>
-                            <li>Go to a safe place</li>
-                            <li>Contact someone close to you</li>
-                            <li>Tell me to call someone</li>
-                        </ul>
-                    `;
-                    chatLog.appendChild(botMessage);
-                } else if (message === "I am being harassed") {
-                    const botMessage = document.createElement("div");
-                    botMessage.className = "chat-message bot-message";
-                    botMessage.innerHTML = `
-                        If you are being harassed, you should:
-                        <ul>
-                            <li>Move to a safe and public location</li>
-                            <li>Seek assistance from nearby authorities or people</li>
-                            <li>Document the incident if safe to do so</li>
-                        </ul>
-                    `;
-                    chatLog.appendChild(botMessage);
-                } else if (message === "Is it safe here?") {
-                    const botMessage = document.createElement("div");
-                    botMessage.className = "chat-message bot-message";
-                    botMessage.innerHTML = `
-                        Safety can depend on the situation. You might want to:
-                        <ul>
-                            <li>Check for nearby exits</li>
-                            <li>Stay alert to your surroundings</li>
-                            <li>Ask someone you trust for advice</li>
-                        </ul>
-                    `;
-                    chatLog.appendChild(botMessage);
-                } else {
-                    await sendMessage(message);
-                }
-
+            } finally {
+                // Hide typing indicator
+                typingIndicator.style.display = "none";
                 chatLog.scrollTop = chatLog.scrollHeight;
-            });
-        });
+            }
+        }
 
         form.addEventListener("submit", (event) => {
             event.preventDefault();
@@ -254,7 +225,55 @@
             }
         });
 
-        recordButton.addEventListener("click", () => {
+        quickButtons.forEach(button => {
+            button.addEventListener("click", () => {
+                const message = button.getAttribute("data-message");
+                const userMessage = document.createElement("div");
+                userMessage.className = "chat-message user-message";
+                userMessage.textContent = message;
+                chatLog.appendChild(userMessage);
+
+                let botMessageContent = "";
+
+                if (message === "I feel unsafe") {
+                    botMessageContent = `
+                        If you feel unsafe, I recommend you to:
+                        <ul>
+                            <li>Go to a safe place</li>
+                            <li>Contact someone close to you</li>
+                            <li>Tell me to call someone</li>
+                        </ul>`;
+                } else if (message === "I am being harassed") {
+                    botMessageContent = `
+                        If you are being harassed, you should:
+                        <ul>
+                            <li>Move to a safe and public location</li>
+                            <li>Seek assistance from nearby authorities or people</li>
+                            <li>Document the incident if safe to do so</li>
+                        </ul>`;
+                } else if (message === "Is it safe here?") {
+                    botMessageContent = `
+                        Safety can depend on the situation. You might want to:
+                        <ul>
+                            <li>Check for nearby exits</li>
+                            <li>Stay alert to your surroundings</li>
+                            <li>Ask someone you trust for advice</li>
+                        </ul>`;
+                }
+
+                if (botMessageContent) {
+                    const botMessage = document.createElement("div");
+                    botMessage.className = "chat-message bot-message";
+                    botMessage.innerHTML = botMessageContent;
+                    chatLog.appendChild(botMessage);
+                }
+
+                chatLog.scrollTop = chatLog.scrollHeight;
+            });
+        });
+
+        // Microphone button logic
+        document.getElementById("record-button").addEventListener("click", () => {
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = "en-US";
 
@@ -263,13 +282,19 @@
             recognition.onresult = function(event) {
                 const speechResult = event.results[0][0].transcript;
 
-                // Send the recognized speech directly to the chatbot without adding it again in the input field
+                // Send the recognized speech directly to the chatbot
                 sendMessage(speechResult);
             };
 
             recognition.onerror = function(event) {
                 console.error("Error during speech recognition:", event.error);
             };
+        });
+
+        // Call button logic
+        document.getElementById("call-button").addEventListener("click", () => {
+            alert("Initiating a call...");
+            // Add functionality here to integrate with a calling service (e.g., WebRTC or Twilio)
         });
     </script>
 </body>

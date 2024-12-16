@@ -8,6 +8,10 @@ document.getElementById("record-button").addEventListener("click", () => {
         const speechResult = event.results[0][0].transcript;
         document.getElementById("user-message").textContent = `You said: "${speechResult}"`;
 
+        // Show "Typing..." indicator
+        const typingIndicator = document.getElementById("typing-indicator");
+        typingIndicator.style.display = "block";
+
         // Send the speech text to the server
         fetch("/api/call", {
             method: "POST",
@@ -18,6 +22,9 @@ document.getElementById("record-button").addEventListener("click", () => {
         })
         .then(response => response.json())
         .then(data => {
+            // Hide "Typing..." indicator
+            typingIndicator.style.display = "none";
+
             if (data.response) {
                 // Display the LLM response
                 document.getElementById("llm-response").textContent = data.response;
@@ -31,7 +38,11 @@ document.getElementById("record-button").addEventListener("click", () => {
                 alert("Error: " + (data.error || "Unknown error occurred."));
             }
         })
-        .catch(error => console.error("Error:", error));
+        .catch(error => {
+            // Hide "Typing..." indicator and log error
+            typingIndicator.style.display = "none";
+            console.error("Error:", error);
+        });
     };
 
     recognition.onerror = function(event) {
