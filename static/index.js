@@ -1,51 +1,80 @@
-document.getElementById("record-button").addEventListener("click", () => {
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = "en-US";
+// Google Maps Functionality
+function initMap() {
+    let map;
+    let userLocation;
+    const directionsService = new google.maps.DirectionsService();
+    const directionsRenderer = new google.maps.DirectionsRenderer();
 
-    recognition.start();
+    // Initialize the map
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 49.1427, lng: 9.2109 },
+        zoom: 13
+    });
+    directionsRenderer.setMap(map);
 
-    recognition.onresult = function(event) {
-        const speechResult = event.results[0][0].transcript;
-        document.getElementById("user-message").textContent = `You said: "${speechResult}"`;
-
-        // Show "Typing..." indicator
-        const typingIndicator = document.getElementById("typing-indicator");
-        typingIndicator.style.display = "block";
-
-        // Send the speech text to the server
-        fetch("/api/call", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
+    // Geolocation
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                userLocation = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+                map.setCenter(userLocation);
             },
-            body: JSON.stringify({ message: speechResult }),
+            () => console.log("Geolocation failed.")
+        );
+    } else {
+        console.log("Geolocation is not supported by this browser.");
+    }
+
+    // Search Location
+    document.getElementById("search-button").addEventListener("click", () => {
+        const query = document.getElementById("search-input").value;
+        if (!query) return;
+
+        const service = new google.maps.places.PlacesService(map);
+        service.findPlaceFromQuery({ query, fields: ["name", "geometry"] }, (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && results[0]) {
+                const place = results[0];
+                map.setCenter(place.geometry.location);
+                new google.maps.Marker({
+                    position: place.geometry.location,
+                    map
+                });
+            } else {
+                alert("Place not found!");
+            }
+        });
+    });
+}
+
+// Chat Functionality
+document.getElementById("chat-form").addEventListener("submit", (event) => {
+    event.preventDefault();
+    const input = document.getElementById("user-input").value.trim();
+
+    if (input) {
+        const chatLog = document.getElementById("chat-log");
+        const userMessage = document.createElement("div");
+        userMessage.className = "chat-message user-message";
+        userMessage.textContent = input;
+        chatLog.appendChild(userMessage);
+
+        fetch("/api/chat", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ message: input })
         })
         .then(response => response.json())
         .then(data => {
-            // Hide "Typing..." indicator
-            typingIndicator.style.display = "none";
-
-            if (data.response) {
-                // Display the LLM response
-                document.getElementById("llm-response").textContent = data.response;
-
-                // Set and play the audio response automatically
-                const audioElement = document.getElementById("response-audio");
-                audioElement.src = data.audio_url;
-                audioElement.style.display = "block";
-                audioElement.play();
-            } else {
-                alert("Error: " + (data.error || "Unknown error occurred."));
-            }
-        })
-        .catch(error => {
-            // Hide "Typing..." indicator and log error
-            typingIndicator.style.display = "none";
-            console.error("Error:", error);
+            const botMessage = document.createElement("div");
+            botMessage.className = "chat-message bot-message";
+            botMessage.textContent = data.response;
+            chatLog.appendChild(botMessage);
         });
-    };
-
-    recognition.onerror = function(event) {
-        console.error("Speech recognition error:", event.error);
-    };
+    }
 });
+
+// Initialize map on page load
+initMap();

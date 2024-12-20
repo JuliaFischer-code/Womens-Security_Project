@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Women's Security App - Startseite</title>
+    <title>Women's Security App</title>
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3hP_MBMqhB_EdFo7ZIJMmNxWJYORrYXY&libraries=places,directions"></script>
     <style>
         body {
@@ -18,6 +18,164 @@
         h1, p {
             text-align: center;
             margin: 10px 0;
+        }
+
+        #chat-container {
+            max-width: 800px;
+            width: 90%;
+            margin: 20px auto;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .chat-header {
+            background-color: #00008b;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .chat-log {
+            height: 300px;
+            overflow-y: auto;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin: 10px;
+            background: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .chat-message {
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            background-color: #d1e7ff;
+            color: #004085;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        .bot-message {
+            background-color: #d4edda;
+            color: #155724;
+            align-self: flex-start;
+            text-align: left;
+        }
+
+        #typing-indicator {
+            font-style: italic;
+            color: gray;
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+            font-size: 1em;
+        }
+
+        .chat-form {
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .chat-form input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .chat-form button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+        }
+
+        .chat-form button[type="submit"] {
+            background-color: #00008b;
+            color: white;
+        }
+
+        .chat-form button[type="submit"]:hover {
+            opacity: 0.9;
+        }
+
+        .chat-form button.record {
+            background-color: lightgray;
+            color: white;
+        }
+
+        .chat-form button.record.recording {
+            background-color: #FFA500;
+            color: white;
+        }
+
+        .chat-form button.sos {
+            background-color: #F44336;
+            color: white;
+        }
+
+        #modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        #modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .contact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .contact:last-child {
+            border-bottom: none;
+        }
+
+        .contact button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .contact button:hover {
+            background-color: #45a049;
         }
 
         #map {
@@ -57,71 +215,14 @@
 
         #travel-mode-container {
             margin: 10px 0;
+            text-align: center;
         }
 
-        #safe-places {
-            width: 90%;
-            max-width: 800px;
-            margin: 20px 0;
+        #travel-mode {
             padding: 10px;
+            font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
-            background-color: #f9f9f9;
-        }
-
-        #safe-places ul {
-            list-style-type: none;
-            padding: 0;
-        }
-
-        #safe-places li {
-            padding: 5px 0;
-            cursor: pointer;
-            border-bottom: 1px solid #ddd;
-        }
-
-        #safe-places li:hover {
-            background-color: #efefef;
-        }
-
-        #action-buttons {
-            display: flex;
-            gap: 20px;
-            margin: 20px 0;
-        }
-
-        .action-button {
-            width: 100px;
-            height: 100px;
-            border: none;
-            border-radius: 50%;
-            font-size: 30px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
-            cursor: pointer;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-
-        .action-button:hover {
-            transform: scale(1.1);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.3);
-        }
-
-        .call {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .chat {
-            background-color: #2196F3;
-            color: white;
-        }
-
-        .sos {
-            background-color: #F44336;
-            color: white;
         }
     </style>
 </head>
@@ -129,17 +230,45 @@
     <h1>Women's Security App</h1>
     <p>Feel Safe, Stay Connected</p>
 
-    <div id="action-buttons">
-        <a href="/call"><button class="action-button call" title="Call an emergency contact">📞</button></a>
-        <a href="/chat"><button class="action-button chat" title="Start a chat">💬</button></a>
-        <a href="/sos"><button class="action-button sos" title="Send an SOS alert">🔔</button></a>
+    <!-- Chat Section -->
+    <div id="chat-container">
+        <div class="chat-header">How can I help you?</div>
+        <div id="chat-log" class="chat-log"></div>
+        <div id="typing-indicator">Typing...</div>
+        <form id="chat-form" class="chat-form">
+            <input type="text" id="user-input" placeholder="Type your message..." required>
+            <button type="submit">Send</button>
+            <button type="button" id="record-button" class="record">🎤</button>
+            <button type="button" id="sos-button" class="sos">📞</button>
+        </form>
     </div>
 
+    <!-- SOS Contacts Modal -->
+    <div id="modal">
+        <div id="modal-content">
+            <h2>Emergency Contacts</h2>
+            <div class="contact">
+                <span>Ambulance</span>
+                <button onclick="confirmCall('112')">Call</button>
+            </div>
+            <div class="contact">
+                <span>Police</span>
+                <button onclick="confirmCall('110')">Call</button>
+            </div>
+            <div class="contact">
+                <span>Way Home Phone</span>
+                <button onclick="confirmCall('03012074182')">Call</button>
+            </div>
+            <br>
+            <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <!-- Google Maps Section -->
     <div id="search-container">
         <input type="text" id="search-input" placeholder="Search for a location, restaurant...">
         <button id="search-button">Search</button>
     </div>
-
     <div id="travel-mode-container">
         <label for="travel-mode">Select Travel Mode:</label>
         <select id="travel-mode">
@@ -149,174 +278,134 @@
             <option value="TRANSIT">Transit</option>
         </select>
     </div>
-
     <div id="map"></div>
 
-    <div id="safe-places">
-        <h3>Top 5 Safe Places</h3>
-        <ul id="places-list">
-            <!-- Safe Places will be dynamically populated here -->
-        </ul>
-    </div>
-
     <script>
-        let map;
-        let userLocation;
-        let directionsService;
-        let directionsRenderer;
+        const chatForm = document.getElementById("chat-form");
+        const chatLog = document.getElementById("chat-log");
+        const typingIndicator = document.getElementById("typing-indicator");
+        const modal = document.getElementById("modal");
 
+        // Handle SOS Modal
+        document.getElementById("sos-button").addEventListener("click", () => {
+            modal.style.display = "flex";
+        });
+
+        function closeModal() {
+            modal.style.display = "none";
+        }
+
+        function confirmCall(phoneNumber) {
+            const confirmAction = confirm(`Do you want to call ${phoneNumber}?`);
+            if (confirmAction) {
+                window.location.href = `tel:${phoneNumber}`;
+            }
+        }
+
+        // Chat Form
+        chatForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            const userInput = document.getElementById("user-input").value.trim();
+
+            if (userInput) {
+                const userMessage = document.createElement("div");
+                userMessage.className = "chat-message user-message";
+                userMessage.textContent = userInput;
+                chatLog.appendChild(userMessage);
+
+                document.getElementById("user-input").value = "";
+                typingIndicator.style.display = "block";
+
+                try {
+                    const response = await fetch("/api/call", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ message: userInput }),
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        const botMessage = document.createElement("div");
+                        botMessage.className = "chat-message bot-message";
+                        botMessage.textContent = data.response;
+                        chatLog.appendChild(botMessage);
+                    }
+                } catch (error) {
+                    console.error(error);
+                } finally {
+                    typingIndicator.style.display = "none";
+                    chatLog.scrollTop = chatLog.scrollHeight;
+                }
+            }
+        });
+
+        // Google Maps Initialization
+        let map, directionsService, directionsRenderer, userLocation;
         function initMap() {
             directionsService = new google.maps.DirectionsService();
             directionsRenderer = new google.maps.DirectionsRenderer();
-
-            // Initialize the map
             map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: 49.1427, lng: 9.2109 }, // Default to Heilbronn, Germany
-                zoom: 13
+                center: { lat: 49.1427, lng: 9.2109 },
+                zoom: 13,
             });
-
             directionsRenderer.setMap(map);
 
-            // Get user location
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        userLocation = {
-                            lat: position.coords.latitude,
-                            lng: position.coords.longitude
-                        };
-                        map.setCenter(userLocation);
+            navigator.geolocation?.getCurrentPosition(
+                (position) => {
+                    userLocation = {
+                        lat: position.coords.latitude,
+                        lng: position.coords.longitude,
+                    };
+                    map.setCenter(userLocation);
+                    new google.maps.Marker({ position: userLocation, map });
+                },
+                console.error
+            );
 
-                        // Add a marker for the user's location
-                        new google.maps.Marker({
-                            position: userLocation,
-                            map,
-                            title: "Your Location"
-                        });
+            map.addListener("click", (event) => {
+                if (!userLocation) return;
 
-                        // Fetch nearby safe places
-                        fetchSafePlaces(userLocation);
+                const destination = event.latLng;
+                const travelMode = document.getElementById("travel-mode").value;
+
+                directionsService.route(
+                    {
+                        origin: userLocation,
+                        destination,
+                        travelMode: google.maps.TravelMode[travelMode],
                     },
-                    () => {
-                        console.log("Geolocation failed. Using default location.");
-                        fetchSafePlaces({ lat: 49.1427, lng: 9.2109 }); // Fallback to Heilbronn
+                    (response, status) => {
+                        if (status === google.maps.DirectionsStatus.OK) {
+                            directionsRenderer.setDirections(response);
+                        } else {
+                            alert("Directions request failed: " + status);
+                        }
                     }
                 );
-            } else {
-                console.log("Geolocation is not supported by this browser.");
-                fetchSafePlaces({ lat: 49.1427, lng: 9.2109 }); // Fallback to Heilbronn
-            }
+            });
 
-            // Add search functionality
-            const searchInput = document.getElementById("search-input");
-            const searchButton = document.getElementById("search-button");
-
-            searchButton.addEventListener("click", () => {
-                const query = searchInput.value;
+            document.getElementById("search-button").addEventListener("click", () => {
+                const query = document.getElementById("search-input").value;
                 if (!query) return;
 
-                const request = {
-                    query,
-                    fields: ["name", "geometry"],
-                };
-
                 const service = new google.maps.places.PlacesService(map);
-                service.findPlaceFromQuery(request, (results, status) => {
-                    if (status === google.maps.places.PlacesServiceStatus.OK && results[0]) {
-                        const place = results[0];
-                        map.setCenter(place.geometry.location);
-                        new google.maps.Marker({
-                            position: place.geometry.location,
-                            map,
-                            title: place.name
-                        });
-
-                        // Calculate and display route
-                        if (userLocation) {
-                            calculateRoute(userLocation, place.geometry.location);
+                service.findPlaceFromQuery(
+                    { query, fields: ["name", "geometry"] },
+                    (results, status) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK && results[0]) {
+                            const place = results[0];
+                            map.setCenter(place.geometry.location);
+                            new google.maps.Marker({
+                                position: place.geometry.location,
+                                map,
+                                title: place.name,
+                            });
                         }
-                    } else {
-                        alert("Place not found!");
                     }
-                });
-            });
-
-            // Add click event to the map for generating route
-            map.addListener("click", (event) => {
-                if (userLocation) {
-                    calculateRoute(userLocation, event.latLng);
-                }
+                );
             });
         }
 
-        function calculateRoute(origin, destination) {
-            const travelMode = document.getElementById("travel-mode").value;
-            const request = {
-                origin,
-                destination,
-                travelMode: google.maps.TravelMode[travelMode]
-            };
-
-            directionsService.route(request, (result, status) => {
-                if (status === google.maps.DirectionsStatus.OK) {
-                    directionsRenderer.setDirections(result);
-                } else {
-                    alert("Could not calculate route: " + status);
-                }
-            });
-        }
-
-        function fetchSafePlaces(location) {
-            const service = new google.maps.places.PlacesService(map);
-            const request = {
-                location: location,
-                radius: 5000,
-                type: ["hospital", "police", "university", "restaurant", "bar", "city_hall"]
-            };
-
-            service.nearbySearch(request, (results, status) => {
-                if (status === google.maps.places.PlacesServiceStatus.OK) {
-                    populateSafePlaces(results.slice(0, 5)); // Top 5 places
-                } else {
-                    console.error("Places API failed with status:", status);
-                }
-            });
-        }
-
-        function populateSafePlaces(places) {
-            const placesList = document.getElementById("places-list");
-            placesList.innerHTML = "";
-
-            places.forEach((place) => {
-                const listItem = document.createElement("li");
-                listItem.textContent = place.name || "Unnamed Place";
-
-                listItem.addEventListener("click", () => {
-                    map.setCenter(place.geometry.location);
-                    new google.maps.Marker({
-                        position: place.geometry.location,
-                        map,
-                        title: place.name
-                    });
-
-                    // Calculate and display route
-                    if (userLocation) {
-                        calculateRoute(userLocation, place.geometry.location);
-                    }
-                });
-
-                placesList.appendChild(listItem);
-
-                // Add marker to map
-                new google.maps.Marker({
-                    position: place.geometry.location,
-                    map,
-                    title: place.name
-                });
-            });
-        }
-
-        // Load the map after the page has loaded
         window.onload = initMap;
     </script>
 </body>
