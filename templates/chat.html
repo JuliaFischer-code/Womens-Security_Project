@@ -170,7 +170,6 @@
 
 
     <script>
-        // JavaScript logic remains unchanged
         const form = document.getElementById("chat-form");
         const chatLog = document.getElementById("chat-log");
         const typingIndicator = document.getElementById("typing-indicator");
@@ -200,11 +199,6 @@
                     botMessage.className = "chat-message bot-message";
                     botMessage.textContent = data.response;
                     chatLog.appendChild(botMessage);
-
-                    if (data.audio_url) {
-                        const audio = new Audio(data.audio_url);
-                        audio.play();
-                    }
                 }
             } catch (err) {
                 console.error("Error:", err);
@@ -233,61 +227,36 @@
                 userMessage.textContent = message;
                 chatLog.appendChild(userMessage);
 
-                let botMessageContent = "";
-
-                if (message === "I feel unsafe") {
-                    botMessageContent = `
-                        If you feel unsafe, I recommend you to:
-                        <ul>
-                            <li>Go to a safe place</li>
-                            <li>Contact someone close to you</li>
-                            <li>Tell me to call someone</li>
-                        </ul>`;
-                } else if (message === "I am being harassed") {
-                    botMessageContent = `
-                        If you are being harassed, you should:
-                        <ul>
-                            <li>Move to a safe and public location</li>
-                            <li>Seek assistance from nearby authorities or people</li>
-                            <li>Document the incident if safe to do so</li>
-                        </ul>`;
-                } else if (message === "Is it safe here?") {
-                    botMessageContent = `
-                        Safety can depend on the situation. You might want to:
-                        <ul>
-                            <li>Check for nearby exits</li>
-                            <li>Stay alert to your surroundings</li>
-                            <li>Ask someone you trust for advice</li>
-                        </ul>`;
-                }
-
-                if (botMessageContent) {
-                    const botMessage = document.createElement("div");
-                    botMessage.className = "chat-message bot-message";
-                    botMessage.innerHTML = botMessageContent;
-                    chatLog.appendChild(botMessage);
-                }
-
-                chatLog.scrollTop = chatLog.scrollHeight;
+                // Process quick button logic as needed
             });
         });
 
         // Microphone button logic
         document.getElementById("record-button").addEventListener("click", () => {
+            if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+                alert("Speech recognition is not supported in this browser.");
+                return;
+            }
+
             const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
             recognition.lang = "en-US";
 
             recognition.start();
 
-            recognition.onresult = function(event) {
+            recognition.onresult = function (event) {
                 const speechResult = event.results[0][0].transcript;
 
                 // Send the recognized speech directly to the chatbot
                 sendMessage(speechResult);
             };
 
-            recognition.onerror = function(event) {
+            recognition.onerror = function (event) {
+                alert("Speech recognition error: " + event.error);
                 console.error("Error during speech recognition:", event.error);
+            };
+
+            recognition.onend = function () {
+                console.log("Speech recognition ended.");
             };
         });
 

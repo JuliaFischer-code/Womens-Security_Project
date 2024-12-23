@@ -1,8 +1,6 @@
 from flask import Flask, render_template, request, jsonify
 import requests
 import os
-from gtts import gTTS
-import time
 
 app = Flask(__name__)
 
@@ -93,16 +91,9 @@ def api_call():
             data = response.json()
             chatbot_response = data['choices'][0]['message']['content']
 
-            # Convert chatbot response to speech
-            timestamp = int(time.time())
-            audio_filename = f"response_{timestamp}.mp3"
-            audio_file_path = os.path.join(AUDIO_FOLDER, audio_filename)
-            tts = gTTS(text=chatbot_response, lang="en")
-            tts.save(audio_file_path)
-
+            # Return only the chatbot response as text (no audio generation)
             return jsonify({
-                "response": chatbot_response,
-                "audio_url": f"/{audio_file_path}"
+                "response": chatbot_response
             })
         else:
             return jsonify({"error": f"Error: {response.status_code}, {response.text}"}), 500
