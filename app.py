@@ -4,9 +4,9 @@ import os
 
 app = Flask(__name__)
 
-# XAI API setup
-XAI_API_KEY = "xai-GzNVUttSmeDYf1Jo9Q2LJt1795nza5A98uXMeJocBehHTbUa26rbZAdbZSDROTO3EZPnCEsHlKAVIyDY"
-XAI_BASE_URL = "https://api.x.ai/v1"
+# OpenAI API setup
+OPENAI_API_KEY = "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"  # Replace with your actual OpenAI API key
+OPENAI_BASE_URL = "https://api.openai.com/v1/chat/completions"
 
 # Create a directory to store audio files if it doesn't exist
 AUDIO_FOLDER = "static/audio"
@@ -35,19 +35,21 @@ def api_chat():
         return jsonify({"error": "Message cannot be empty"}), 400
 
     try:
-        # Make the API call to XAI
+        # Make the API call to OpenAI
         response = requests.post(
-            f"{XAI_BASE_URL}/chat/completions",
+            OPENAI_BASE_URL,
             headers={
-                "Authorization": f"Bearer {XAI_API_KEY}",
+                "Authorization": f"Bearer {OPENAI_API_KEY}",
                 "Content-Type": "application/json",
             },
             json={
-                "model": "grok-beta",
+                "model": "gpt-3.5-turbo",  # Use the desired OpenAI model
                 "messages": [
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": user_message},
                 ],
+                "max_tokens": 150,
+                "temperature": 0.7,
             }
         )
 
@@ -71,19 +73,21 @@ def api_call():
         return jsonify({"error": "Message cannot be empty"}), 400
 
     try:
-        # Make the API call to XAI
+        # Make the API call to OpenAI
         response = requests.post(
-            f"{XAI_BASE_URL}/chat/completions",
+            OPENAI_BASE_URL,
             headers={
-                "Authorization": f"Bearer {XAI_API_KEY}",
+                "Authorization": f"Bearer {OPENAI_API_KEY}",
                 "Content-Type": "application/json",
             },
             json={
-                "model": "grok-beta",
+                "model": "gpt-3.5-turbo",  # Use the desired OpenAI model
                 "messages": [
                     {"role": "system", "content": "You are a helpful assistant."},
                     {"role": "user", "content": user_message},
                 ],
+                "max_tokens": 150,
+                "temperature": 0.7,
             }
         )
 
@@ -91,7 +95,6 @@ def api_call():
             data = response.json()
             chatbot_response = data['choices'][0]['message']['content']
 
-            # Return only the chatbot response as text (no audio generation)
             return jsonify({
                 "response": chatbot_response
             })
@@ -101,5 +104,5 @@ def api_call():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-if __name__ == "__main__":
+if __name__ == "_main_":
     app.run(host="0.0.0.0", port=5001)
