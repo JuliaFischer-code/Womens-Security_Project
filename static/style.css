@@ -16,7 +16,7 @@ body {
 
 /* Styling for the chat buttons */
 .chat-form button.call {
-  background-color: green;
+  background-color: #07dcb2;
   color: white;
   border: none;
   border-radius: 5px;
@@ -31,7 +31,7 @@ body {
 }
 
 .chat-form button.record {
-  background-color: red;
+  background-color: #07dcb2;
   color: white;
   border: none;
   border-radius: 5px;
@@ -46,8 +46,8 @@ body {
 }
 
 .chat-form button[type="submit"] {
-  background-color: #00008b;
-  color: white;
+  background-color: #ff083d;
+  color: black;
   border: none;
   border-radius: 5px;
   padding: 10px 15px;
