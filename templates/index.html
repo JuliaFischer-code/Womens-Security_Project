@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Women's Security App</title>
     <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Logo" style="width: 150px; height: auto;">
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3hP_MBMqhB_EdFo7ZIJMmNxWJYORrYXY&libraries=places,directions"></script>
+    <title>Women's Security App</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -117,21 +116,6 @@
             opacity: 0.9;
         }
 
-        .chat-form button.record {
-            background-color: lightgray;
-            color: white;
-        }
-
-        .chat-form button.record.recording {
-            background-color: #FFA500;
-            color: white;
-        }
-
-        .chat-form button.sos {
-            background-color: #F44336;
-            color: white;
-        }
-
         #modal {
             display: none;
             position: fixed;
@@ -185,47 +169,28 @@
             margin: 20px 0;
         }
 
-        #search-container {
-            width: 90%;
-            max-width: 800px;
-            margin: 10px 0;
+        .chat-options {
             display: flex;
+            flex-wrap: wrap;
             gap: 10px;
         }
 
-        #search-input {
-            flex: 1;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        #search-button {
-            padding: 10px 15px;
-            background-color: #4CAF50;
+        .chat-option-button {
+            background-color: #38b6ff;
             color: white;
             border: none;
             border-radius: 5px;
+            padding: 10px 20px;
             cursor: pointer;
+            transition: background-color 0.3s;
         }
 
-        #search-button:hover {
-            background-color: #45a049;
-        }
-
-        #travel-mode-container {
-            margin: 10px 0;
-            text-align: center;
-        }
-
-        #travel-mode {
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
+        .chat-option-button:hover {
+            background-color: #007bb5;
         }
     </style>
+    <!-- Load Google Maps -->
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places,directions"></script>
 </head>
 <body>
     <h1>Women's Security App</h1>
@@ -234,15 +199,22 @@
     <!-- Chat Section -->
     <div id="chat-container">
         <div class="chat-header">How can I help you?</div>
-        <div id="chat-log" class="chat-log"></div>
+        <div id="chat-log" class="chat-log">
+            <!-- Predefined clickable items -->
+            <div class="chat-options">
+                <button class="chat-option-button" onclick="showSafePlaces()">Safe places nearby</button>
+                <button class="chat-option-button" onclick="showEmergencyContacts()">Emergency contacts</button>
+            </div>
+        </div>
         <div id="typing-indicator">Typing...</div>
         <form id="chat-form" class="chat-form">
             <input type="text" id="user-input" placeholder="Type your message..." required>
             <button type="submit">Send</button>
-            <button type="button" id="record-button" class="record">🎤</button>
-            <button type="button" id="sos-button" class="sos">📞</button>
         </form>
     </div>
+
+    <!-- Google Maps Section -->
+    <div id="map"></div>
 
     <!-- SOS Contacts Modal -->
     <div id="modal">
@@ -265,146 +237,7 @@
         </div>
     </div>
 
-    <!-- Google Maps Section -->
-    </div>
-    <div id="travel-mode-container">
-        <label for="travel-mode">Select Travel Mode:</label>
-        <select id="travel-mode">
-            <option value="WALKING">Walking</option>
-            <option value="DRIVING">Driving</option>
-            <option value="BICYCLING">Bicycling</option>
-            <option value="TRANSIT">Transit</option>
-        </select>
-    </div>
-    <div id="map"></div>
-
-    <script>
-        const chatForm = document.getElementById("chat-form");
-        const chatLog = document.getElementById("chat-log");
-        const typingIndicator = document.getElementById("typing-indicator");
-        const modal = document.getElementById("modal");
-
-        // Handle SOS Modal
-        document.getElementById("sos-button").addEventListener("click", () => {
-            modal.style.display = "flex";
-        });
-
-        function closeModal() {
-            modal.style.display = "none";
-        }
-
-        function confirmCall(phoneNumber) {
-            const confirmAction = confirm(`Do you want to call ${phoneNumber}?`);
-            if (confirmAction) {
-                window.location.href = `tel:${phoneNumber}`;
-            }
-        }
-
-        // Chat Form
-        chatForm.addEventListener("submit", async (event) => {
-            event.preventDefault();
-            const userInput = document.getElementById("user-input").value.trim();
-
-            if (userInput) {
-                const userMessage = document.createElement("div");
-                userMessage.className = "chat-message user-message";
-                userMessage.textContent = userInput;
-                chatLog.appendChild(userMessage);
-
-                document.getElementById("user-input").value = "";
-                typingIndicator.style.display = "block";
-
-                try {
-                    const response = await fetch("/api/call", {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ message: userInput }),
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        const botMessage = document.createElement("div");
-                        botMessage.className = "chat-message bot-message";
-                        botMessage.textContent = data.response;
-                        chatLog.appendChild(botMessage);
-                    }
-                } catch (error) {
-                    console.error(error);
-                } finally {
-                    typingIndicator.style.display = "none";
-                    chatLog.scrollTop = chatLog.scrollHeight;
-                }
-            }
-        });
-
-        // Google Maps Initialization
-        let map, directionsService, directionsRenderer, userLocation;
-        function initMap() {
-            directionsService = new google.maps.DirectionsService();
-            directionsRenderer = new google.maps.DirectionsRenderer();
-            map = new google.maps.Map(document.getElementById("map"), {
-                center: { lat: 49.1427, lng: 9.2109 },
-                zoom: 13,
-            });
-            directionsRenderer.setMap(map);
-
-            navigator.geolocation?.getCurrentPosition(
-                (position) => {
-                    userLocation = {
-                        lat: position.coords.latitude,
-                        lng: position.coords.longitude,
-                    };
-                    map.setCenter(userLocation);
-                    new google.maps.Marker({ position: userLocation, map });
-                },
-                console.error
-            );
-
-            map.addListener("click", (event) => {
-                if (!userLocation) return;
-
-                const destination = event.latLng;
-                const travelMode = document.getElementById("travel-mode").value;
-
-                directionsService.route(
-                    {
-                        origin: userLocation,
-                        destination,
-                        travelMode: google.maps.TravelMode[travelMode],
-                    },
-                    (response, status) => {
-                        if (status === google.maps.DirectionsStatus.OK) {
-                            directionsRenderer.setDirections(response);
-                        } else {
-                            alert("Directions request failed: " + status);
-                        }
-                    }
-                );
-            });
-
-            document.getElementById("search-button").addEventListener("click", () => {
-                const query = document.getElementById("search-input").value;
-                if (!query) return;
-
-                const service = new google.maps.places.PlacesService(map);
-                service.findPlaceFromQuery(
-                    { query, fields: ["name", "geometry"] },
-                    (results, status) => {
-                        if (status === google.maps.places.PlacesServiceStatus.OK && results[0]) {
-                            const place = results[0];
-                            map.setCenter(place.geometry.location);
-                            new google.maps.Marker({
-                                position: place.geometry.location,
-                                map,
-                                title: place.name,
-                            });
-                        }
-                    }
-                );
-            });
-        }
-
-        window.onload = initMap;
-    </script>
+    <!-- Load JavaScript -->
+    <script src="{{ url_for('static', filename='index.js') }}"></script>
 </body>
 </html>
