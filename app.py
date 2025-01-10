@@ -68,7 +68,7 @@ def api_chat():
 def safe_places():
     data = request.json
     user_location = data.get("location")  # { "lat": float, "lng": float }
-    query = data.get("query")  # e.g., "hospital", "police station"
+    query = data.get("query")  # e.g., "restaurant", "shop", "police station"
 
     if not user_location or not query:
         return jsonify({"error": "Location and query are required"}), 400
@@ -78,37 +78,35 @@ def safe_places():
         places_result = gmaps.places_nearby(
             location=(user_location["lat"], user_location["lng"]),
             radius=2000,  # 2 km radius
-            keyword=query
+            keyword=query  # Query for user-specified or combined keywords
         )
 
         if not places_result.get("results"):
             return jsonify({"error": "No results found for the query."}), 404
-        
-        # Find the closest place based on distance
-        closest_place = min(
+
+        # Extract the 3 closest places based on distance
+        safe_places = sorted(
             places_result["results"],
             key=lambda place: (
                 abs(user_location["lat"] - place["geometry"]["location"]["lat"]) +
                 abs(user_location["lng"] - place["geometry"]["location"]["lng"])
             )
-        )
-        # Extract relevant information from the API response
-        safe_places = [
+        )[:3]
+
+        # Format the response for each place
+        formatted_places = [
             {
                 "name": place["name"],
                 "lat": place["geometry"]["location"]["lat"],
                 "lng": place["geometry"]["location"]["lng"],
                 "address": place.get("vicinity", "Address not available"),
             }
-            for place in places_result["results"]
+            for place in safe_places
         ]
 
-        return jsonify({"places": safe_places})
+        return jsonify({"places": formatted_places})
 
     except googlemaps.exceptions.ApiError as api_error:
         return jsonify({"error": f"Google Maps API error: {api_error}"}), 500
     except Exception as e:
         return jsonify({"error": f"Internal server error: {e}"}), 500
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001)

@@ -106,31 +106,59 @@ async function fetchClosestSafePlace(query) {
             }),
         });
 
-        console.log("Safe places response from backend:", response);
-
         if (response.ok) {
             const data = await response.json();
-            const place = data.place;
 
-            console.log(`Closest ${query}:`, place);
+            // Prepare the message for the chatbox
+            let placesMessage = `Here are the 3 nearest ${query}s:\n`;
+            placesMessage += data.places
+                .map(
+                    (place, index) =>
+                        `${index + 1}. ${place.name} (${place.address})`
+                )
+                .join("\n");
 
-            // Plot the closest place on the map
-            new google.maps.Marker({
-                position: { lat: place.lat, lng: place.lng },
-                map: map,
-                title: `${place.name}\n${place.address}`,
+            // Add bot's response to the chatbox
+            const chatLog = document.getElementById("chat-log");
+
+            const botMessage = document.createElement("div");
+            botMessage.className = "chat-message bot-message";
+            botMessage.textContent = placesMessage;
+
+            chatLog.appendChild(botMessage);
+
+            // Plot markers on the map
+            data.places.forEach((place) => {
+                new google.maps.Marker({
+                    position: { lat: place.lat, lng: place.lng },
+                    map: map,
+                    title: `${place.name}\n${place.address}`,
+                });
             });
-
-            alert(`Closest ${query} found: ${place.name}, ${place.address}`);
         } else {
-            console.error("Error from backend:", response.status, response.statusText);
-            alert(`Could not find a ${query} nearby.`);
+            const error = await response.json();
+            const errorMessage = `Error fetching ${query}: ${error.error}`;
+
+            // Display error message in chatbox
+            const chatLog = document.getElementById("chat-log");
+            const botMessage = document.createElement("div");
+            botMessage.className = "chat-message bot-message";
+            botMessage.textContent = errorMessage;
+
+            chatLog.appendChild(botMessage);
         }
     } catch (error) {
         console.error("Error during fetch:", error);
-        alert(`An error occurred while fetching ${query}.`);
+        const chatLog = document.getElementById("chat-log");
+
+        const botMessage = document.createElement("div");
+        botMessage.className = "chat-message bot-message";
+        botMessage.textContent = `An error occurred while fetching ${query}.`;
+
+        chatLog.appendChild(botMessage);
     }
 }
+
 
 // Google Maps Initialization
 function initMap() {
