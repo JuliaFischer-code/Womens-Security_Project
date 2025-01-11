@@ -137,6 +137,18 @@
             text-align: center;
         }
 
+        #safety-protocol-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
         .contact {
             display: flex;
             justify-content: space-between;
@@ -204,6 +216,7 @@
             <div class="chat-options">
                 <button class="chat-option-button" onclick="showSafePlaces()">Safe places nearby</button>
                 <button class="chat-option-button" onclick="showEmergencyContacts()">Emergency contacts</button>
+                <button class="chat-option-button" onclick="showSafetyProtocol()">Safety Protocol</button>
                 <button class="chat-option-button" onclick="fetchClosestSafePlace('restaurant')">Restaurants Nearby</button>
                 <button class="chat-option-button" onclick="fetchClosestSafePlace('shop')">Shops Nearby</button>
                 <button class="chat-option-button" onclick="fetchClosestSafePlace('police station')">Police Stations Nearby</button>
@@ -237,6 +250,22 @@
             </div>
             <br>
             <button onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+
+    <div id="safety-protocol-modal" style="display: none;">
+        <div class="modal-content">
+            <h2>Safety Protocol - Act Quickly</h2>
+            <p>Do you feel followed, harassed, or threatened?</p>
+            <ul>
+                <li>Share your location with a trusted contact.</li>
+                <li>Move to a safe place (busy area, shop, public building).</li>
+                <li>Activate SOS: Request help by a trusted contact or emergency services.</li>
+                <li>Send a code word, if you can't speak.</li>
+                <li>After the situation: Document the incident (e.g., photos) and report to authorities.</li>
+            </ul>
+            <button onclick="closeSafetyProtocol()">Close</button>
         </div>
     </div>
 

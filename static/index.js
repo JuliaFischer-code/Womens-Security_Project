@@ -1,3 +1,5 @@
+console.log("JavaScript ist geladen und funktioniert!");
+
 // Initialize variables for Google Maps
 let map, directionsService, directionsRenderer, userLocation;
 
@@ -35,6 +37,31 @@ function confirmCall(phoneNumber) {
         window.location.href = `tel:${phoneNumber}`;
     }
 }
+
+// Safety Protocol
+function showSafetyProtocol() {
+    const modal = document.getElementById("safety-protocol-modal");
+    if (modal) {
+        modal.style.display = "flex"; // Modal anzeigen
+        console.log("Safety Protocol modal displayed.");
+    } else {
+        console.error("Safety Protocol modal not found!");
+    }
+}
+
+function closeSafetyProtocol() {
+    const modal = document.getElementById("safety-protocol-modal");
+    if (modal) {
+        modal.style.display = "none"; // Modal verstecken
+        console.log("Safety Protocol modal hidden.");
+    } else {
+        console.error("Safety Protocol modal not found!");
+    }
+}
+
+// Globally expose the functions
+window.showSafetyProtocol = showSafetyProtocol;
+window.closeSafetyProtocol = closeSafetyProtocol;
 
 // Handle chat form submission
 document.getElementById("chat-form").addEventListener("submit", async (event) => {
