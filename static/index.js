@@ -156,11 +156,7 @@ async function fetchClosestSafePlace(query) {
 
             // Plot markers on the map
             data.places.forEach((place) => {
-                new google.maps.Marker({
-                    position: { lat: place.lat, lng: place.lng },
-                    map: map,
-                    title: `${place.name}\n${place.address}`,
-                });
+                createMarker(place);
             });
         } else {
             const error = await response.json();
@@ -186,6 +182,70 @@ async function fetchClosestSafePlace(query) {
     }
 }
 
+// Create a marker and attach click event for info and directions
+function createMarker(place) {
+    const marker = new google.maps.Marker({
+        position: { lat: place.lat, lng: place.lng },
+        map: map,
+        title: place.name,
+    });
+
+    const infoWindow = new google.maps.InfoWindow();
+
+    marker.addListener("click", () => {
+        const content = `
+            <div>
+                <h3>${place.name}</h3>
+                <p>${place.address}</p>
+                <label for="travel-mode">Select travel mode:</label>
+                <div style="margin: 10px 0;">
+                    <button onclick="setTravelModeAndGetDirections('${place.lat}', '${place.lng}', 'DRIVING')">Car</button>
+                    <button onclick="setTravelModeAndGetDirections('${place.lat}', '${place.lng}', 'WALKING')">Walking</button>
+                    <button onclick="setTravelModeAndGetDirections('${place.lat}', '${place.lng}', 'BICYCLING')">Bicycle</button>
+                    <button onclick="setTravelModeAndGetDirections('${place.lat}', '${place.lng}', 'TRANSIT')">Public Transport</button>
+                </div>
+            </div>
+        `;
+        infoWindow.setContent(content);
+        infoWindow.open(map, marker);
+    });
+}
+
+// Handle travel mode selection and get directions
+function setTravelModeAndGetDirections(lat, lng, mode) {
+    const travelMode = google.maps.TravelMode[mode];
+
+    const directionsRequest = {
+        origin: userLocation,
+        destination: { lat: parseFloat(lat), lng: parseFloat(lng) },
+        travelMode: travelMode,
+    };
+
+    directionsService.route(directionsRequest, (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+            directionsRenderer.setDirections(result);
+        } else {
+            alert(`Could not retrieve directions: ${status}`);
+        }
+    });
+}
+
+// Get directions to a specific location
+function getDirections(lat, lng) {
+    const directionsRequest = {
+        origin: userLocation,
+        destination: { lat, lng },
+        travelMode: google.maps.TravelMode.DRIVING,
+    };
+
+    directionsService.route(directionsRequest, (result, status) => {
+        if (status === google.maps.DirectionsStatus.OK) {
+            directionsRenderer.setDirections(result);
+        } else {
+            alert("Could not retrieve directions: " + status);
+        }
+    });
+}
 
 // Google Maps Initialization
 function initMap() {
