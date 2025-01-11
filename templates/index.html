@@ -19,7 +19,18 @@
             text-align: center;
             margin: 10px 0;
         }
+            /* Präzises Styling nur für das Sicherheitsprotokoll */
+    #safety-protocol-modal #modal-content ul {
+        padding-left: 20px;
+        list-style-position: inside;
+        text-align: left;
+        font-family: Arial, sans-serif;
+        font-size: 16px;
+    }
 
+    #safety-protocol-modal #modal-content ul li {
+        margin-bottom: 10px;
+    }
         #chat-container {
             max-width: 800px;
             width: 90%;
@@ -260,12 +271,12 @@
             <div>
                 <p>Do you feel followed, harassed, or threatened?</p>
                 <ul>
-                    <li>Share your location with a trusted contact.</li>
-                    <li>Move to a safe place (busy area, shop, public building).</li>
-                    <li>Activate SOS: Request help by a trusted contact or emergency services.</li>
-                    <li>Send a code word, if you can't speak.</li>
-                    <li>After the situation: Document the incident (e.g., photos) and report to authorities.</li>
-                </ul>
+    <li>Share your location with a trusted contact.</li>
+    <li>Move to a safe place (busy area, shop, public building).</li>
+    <li>Activate SOS: Request help by a trusted contact or emergency services.</li>
+    <li>Send a code word, if you can't speak.</li>
+    <li>After the situation: Document the incident (e.g., photos) and report to authorities.</li>
+</ul>
             </div>
             <button onclick="closeSafetyProtocol()">Close</button>
         </div>

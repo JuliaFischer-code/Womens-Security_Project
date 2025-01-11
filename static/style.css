@@ -59,3 +59,15 @@ body {
 .chat-form button[type="submit"]:hover {
   opacity: 0.9;
 }
+
+#safety-protocol-modal #modal-content ul {
+  padding-left: 20px; /* Abstand zwischen Rand und Listenpunkten */
+  list-style-position: inside; /* Punkte bleiben innerhalb des Containers */
+  text-align: left; /* Text wird linksbündig ausgerichtet */
+  font-family: Arial, sans-serif; /* Standard-Schriftart nur für diesen Bereich */
+  font-size: 16px; /* Standard-Schriftgröße nur für diesen Bereich */
+}
+
+#safety-protocol-modal #modal-content ul li {
+  margin-bottom: 10px; /* Abstand zwischen den Listenpunkten */
+}
