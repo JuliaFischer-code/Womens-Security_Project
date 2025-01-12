@@ -2,6 +2,7 @@ console.log("JavaScript ist geladen und funktioniert!");
 
 // Initialize variables for Google Maps
 let map, directionsService, directionsRenderer, userLocation;
+let markers = []; // Liste für alle Marker
 
 // Show safe places nearby
 function showSafePlaces() {
@@ -190,6 +191,8 @@ function createMarker(place) {
         title: place.name,
     });
 
+    markers.push(marker); // Speichere den Marker
+
     const infoWindow = new google.maps.InfoWindow();
 
     marker.addListener("click", () => {
@@ -199,15 +202,40 @@ function createMarker(place) {
                 <p>${place.address}</p>
                 <label for="travel-mode">Select travel mode:</label>
                 <div style="margin: 10px 0;">
-                    <button onclick="setTravelModeAndGetDirections('${place.lat}', '${place.lng}', 'DRIVING')">Car</button>
-                    <button onclick="setTravelModeAndGetDirections('${place.lat}', '${place.lng}', 'WALKING')">Walking</button>
-                    <button onclick="setTravelModeAndGetDirections('${place.lat}', '${place.lng}', 'BICYCLING')">Bicycle</button>
-                    <button onclick="setTravelModeAndGetDirections('${place.lat}', '${place.lng}', 'TRANSIT')">Public Transport</button>
+                    <button onclick="setTravelModeAndGetDirections(${place.lat}, ${place.lng}, 'DRIVING')">Car</button>
+                    <button onclick="setTravelModeAndGetDirections(${place.lat}, ${place.lng}, 'WALKING')">Walking</button>
+                    <button onclick="setTravelModeAndGetDirections(${place.lat}, ${place.lng}, 'BICYCLING')">Bicycle</button>
+                    <button onclick="setTravelModeAndGetDirections(${place.lat}, ${place.lng}, 'TRANSIT')">Public Transport</button>
                 </div>
             </div>
         `;
         infoWindow.setContent(content);
         infoWindow.open(map, marker);
+
+        // Verstecke andere Marker
+        hideOtherMarkers(marker);
+
+        // Event-Listener für das Schließen des Info-Fensters
+        google.maps.event.addListener(infoWindow, "closeclick", () => {
+            directionsRenderer.setDirections({}); // Lösche Route
+            showAllMarkers(); // Zeige alle Marker
+        });
+    });
+}
+
+// Funktion zum Verstecken aller Marker außer dem ausgewählten
+function hideOtherMarkers(selectedMarker) {
+    markers.forEach((marker) => {
+        if (marker !== selectedMarker) {
+            marker.setMap(null); // Verstecke Marker
+        }
+    });
+}
+
+// Funktion zum Anzeigen aller Marker
+function showAllMarkers() {
+    markers.forEach((marker) => {
+        marker.setMap(map); // Zeige alle Marker wieder an
     });
 }
 
@@ -226,23 +254,6 @@ function setTravelModeAndGetDirections(lat, lng, mode) {
             directionsRenderer.setDirections(result);
         } else {
             alert(`Could not retrieve directions: ${status}`);
-        }
-    });
-}
-
-// Get directions to a specific location
-function getDirections(lat, lng) {
-    const directionsRequest = {
-        origin: userLocation,
-        destination: { lat, lng },
-        travelMode: google.maps.TravelMode.DRIVING,
-    };
-
-    directionsService.route(directionsRequest, (result, status) => {
-        if (status === google.maps.DirectionsStatus.OK) {
-            directionsRenderer.setDirections(result);
-        } else {
-            alert("Could not retrieve directions: " + status);
         }
     });
 }
