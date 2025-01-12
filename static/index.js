@@ -272,6 +272,13 @@ function initMap() {
 
     directionsRenderer.setMap(map);
 
+    // Benutzerdefiniertes Pin-Icon für den Nutzerstandort
+    const userLocationIcon = {
+        url: "https://maps.google.com/mapfiles/ms/icons/blue-dot.png", // Blauer Punkt (Pin-Stil)
+        scaledSize: new google.maps.Size(30, 30), // Icon-Größe (kleiner und dezent)
+    };
+
+    // Nutzerstandort ermitteln und Marker setzen
     navigator.geolocation?.getCurrentPosition(
         (position) => {
             userLocation = {
@@ -280,7 +287,13 @@ function initMap() {
             };
             console.log("User location obtained:", userLocation);
             map.setCenter(userLocation);
-            new google.maps.Marker({ position: userLocation, map });
+            // Marker mit benutzerdefiniertem Icon
+            new google.maps.Marker({
+                position: userLocation,
+                map: map,
+                icon: userLocationIcon, // Benutzerdefiniertes Pin-Icon
+                title: "Your Location",
+            });
         },
         (error) => {
             console.error("Geolocation error:", error);
