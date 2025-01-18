@@ -4,15 +4,51 @@ console.log("JavaScript ist geladen und funktioniert!");
 let map, directionsService, directionsRenderer, userLocation;
 let markers = []; // Liste für alle Marker
 
+// Entferne alle Marker von der Karte
+function clearMarkers() {
+    markers.forEach((marker) => {
+        marker.setMap(null); // Entferne den Marker von der Karte
+    });
+    markers = []; // Leere die Marker-Liste
+}
+
+// Debugging: Anzahl der Marker auf der Karte
+function logMarkerCount() {
+    console.log(`Number of markers on the map: ${markers.length}`);
+}
+
 // Show safe places nearby
 function showSafePlaces() {
-    console.log("Safe places button clicked."); // Debug log
+    console.log("Safe places button clicked.");
 
     if (userLocation) {
-        console.log("Fetching safe places for categories: hospital, police station, fire station"); // Debug log
-        fetchClosestSafePlace("hospital");
-        fetchClosestSafePlace("police station");
-        fetchClosestSafePlace("fire station");
+        console.log("Fetching safe places for categories: hospital, police station, fire station");
+
+        // Entferne alle bestehenden Marker vor dem Hinzufügen neuer
+        clearMarkers();
+
+        // Alle Kategorien nacheinander abrufen
+        const categories = ["hospital", "police station", "fire station"];
+        categories.forEach((category) => {
+            fetchClosestSafePlace(category);
+        });
+    } else {
+        alert("User location not available! Please enable location services.");
+    }
+}
+
+// Show shops nearby (example of another button)
+function showShopsNearby() {
+    console.log("Shops nearby button clicked.");
+
+    if (userLocation) {
+        console.log("Fetching shops nearby");
+
+        // Entferne alte Marker
+        clearMarkers();
+
+        // Kategorie "shop" abrufen
+        fetchClosestSafePlace("shop");
     } else {
         alert("User location not available! Please enable location services.");
     }
@@ -123,6 +159,9 @@ async function fetchClosestSafePlace(query) {
         alert("User location not available!");
         return;
     }
+
+    // Entferne alte Marker, bevor neue hinzugefügt werden
+    clearMarkers();
 
     try {
         const response = await fetch("/api/safe-places", {
