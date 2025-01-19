@@ -497,4 +497,52 @@ function initMap() {
     );
 }
 
+// Add Speech-to-Text functionality
+if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = 'en-US'; // Set the recognition language (adjust as needed)
+    recognition.interimResults = false; // Return only final results
+    recognition.continuous = false; // Single result per session
+
+    const micButton = document.getElementById("mic-button");
+    const userInput = document.getElementById("user-input");
+
+    micButton.addEventListener("click", () => {
+        // Start speech recognition
+        recognition.start();
+        micButton.disabled = true; // Disable button while listening
+        micButton.textContent = "🎙️ Listening..."; // Show "listening" state
+    });
+
+    recognition.addEventListener("result", (event) => {
+        const transcript = event.results[0][0].transcript; // Capture the speech text
+        const userInput = document.getElementById("user-input");
+        const chatForm = document.getElementById("chat-form");
+    
+        userInput.value = transcript; // Insert text into the input field
+    
+        // Automatically submit the form
+        const submitEvent = new Event("submit", { bubbles: true, cancelable: true });
+        chatForm.dispatchEvent(submitEvent);
+    });
+    
+
+    recognition.addEventListener("end", () => {
+        // Reset button state when recognition ends
+        micButton.disabled = false;
+        micButton.textContent = "🎤"; // Reset button text to default
+    });
+
+    recognition.addEventListener("error", (event) => {
+        console.error("Speech recognition error:", event.error);
+        micButton.disabled = false;
+        micButton.textContent = "🎤"; // Reset button text in case of errors
+    });
+} else {
+    // Disable the microphone button if the browser doesn't support speech-to-text
+    const micButton = document.getElementById("mic-button");
+    micButton.disabled = true;
+    micButton.title = "Speech-to-text not supported in this browser.";
+}
+
 window.onload = initMap; // Initialize the map when the page loads
