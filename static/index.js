@@ -98,17 +98,20 @@ async function fetchClosestSafePlace(query) {
             hideChatPlaceholder();
 
             // Prepare the message for the chatbox
-            let placesMessage = `Here are the 3 nearest ${query}s:\n`;
+            let placesMessage = `<p>Here are the 3 nearest ${query}s:</p><ul>`;
             placesMessage += data.places
-                .map((place, index) => `${index + 1}. ${place.name} (${place.address})`)
-                .join("\n");
+                .map(
+                    (place, index) => `<li>${index + 1}. <strong>${place.name}</strong> (${place.address})</li>`
+                )
+                .join("");
+            placesMessage += "</ul>";
 
             // Add bot's response to the chatbox
             const chatLog = document.getElementById("chat-log");
 
             const botMessage = document.createElement("div");
             botMessage.className = "chat-message bot-message";
-            botMessage.textContent = placesMessage;
+            botMessage.innerHTML = placesMessage; // Use innerHTML for structured content
 
             chatLog.appendChild(botMessage);
 
