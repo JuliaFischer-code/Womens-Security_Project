@@ -10,6 +10,143 @@ function scrollToBottom() {
     chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: "smooth" });
 }
 
+// Function to hide the chat placeholder
+function hideChatPlaceholder() {
+    const placeholder = document.getElementById("chat-placeholder");
+    if (placeholder) {
+        placeholder.style.display = "none"; // Hide placeholder
+    }
+}
+
+// Handle chat form submission
+document.getElementById("chat-form").addEventListener("submit", async (event) => {
+    event.preventDefault(); // Prevent page reload
+    const input = document.getElementById("user-input").value.trim();
+
+    if (input) {
+        const chatLog = document.getElementById("chat-log");
+
+        // Hide the placeholder
+        hideChatPlaceholder();
+
+        // Display user message in the chatbox
+        const userMessage = document.createElement("div");
+        userMessage.className = "chat-message user-message";
+        userMessage.textContent = input;
+        chatLog.appendChild(userMessage);
+
+        // Scroll to the bottom after adding the user message
+        scrollToBottom();
+
+        document.getElementById("user-input").value = ""; // Clear input field
+
+        try {
+            // Send the message to the backend
+            const response = await fetch("/api/chat", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ message: input }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+
+                // Display bot response
+                const botMessage = document.createElement("div");
+                botMessage.className = "chat-message bot-message";
+                botMessage.textContent = data.response;
+                chatLog.appendChild(botMessage);
+
+                // Hide placeholder (in case it reappears accidentally)
+                hideChatPlaceholder();
+
+                // Scroll to the bottom after adding the bot response
+                scrollToBottom();
+            } else {
+                console.error("Error from backend:", response.status, response.statusText);
+            }
+        } catch (error) {
+            console.error("Error during fetch:", error);
+        }
+    }
+});
+
+// Fetch the closest safe place from the backend
+async function fetchClosestSafePlace(query) {
+    if (!userLocation) {
+        alert("User location not available!");
+        return;
+    }
+
+    // Remove all existing markers before fetching new data
+    clearMarkers();
+
+    try {
+        const response = await fetch("/api/safe-places", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                location: userLocation,
+                query: query,
+            }),
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+
+            // Hide the chatbot placeholder
+            hideChatPlaceholder();
+
+            // Prepare the message for the chatbox
+            let placesMessage = `Here are the 3 nearest ${query}s:\n`;
+            placesMessage += data.places
+                .map((place, index) => `${index + 1}. ${place.name} (${place.address})`)
+                .join("\n");
+
+            // Add bot's response to the chatbox
+            const chatLog = document.getElementById("chat-log");
+
+            const botMessage = document.createElement("div");
+            botMessage.className = "chat-message bot-message";
+            botMessage.textContent = placesMessage;
+
+            chatLog.appendChild(botMessage);
+
+            // Hide placeholder
+            hideChatPlaceholder();
+
+            // Scroll to the latest message
+            scrollToBottom();
+
+            // Plot markers on the map
+            data.places.forEach((place) => {
+                createMarker(place);
+            });
+        } else {
+            const error = await response.json();
+            const errorMessage = `Error fetching ${query}: ${error.error}`;
+
+            // Display error message in chatbox
+            const chatLog = document.getElementById("chat-log");
+            const botMessage = document.createElement("div");
+            botMessage.className = "chat-message bot-message";
+            botMessage.textContent = errorMessage;
+
+            chatLog.appendChild(botMessage);
+        }
+    } catch (error) {
+        console.error("Error during fetch:", error);
+        const chatLog = document.getElementById("chat-log");
+
+        const botMessage = document.createElement("div");
+        botMessage.className = "chat-message bot-message";
+        botMessage.textContent = `An error occurred while fetching ${query}.`;
+
+        chatLog.appendChild(botMessage);
+    }
+}
+
+
 // Entferne alle Marker von der Karte
 function clearMarkers() {
     markers.forEach((marker) => {
@@ -30,6 +167,9 @@ function showSafePlaces() {
     if (userLocation) {
         console.log("Fetching safe places for categories: hospital, police station, fire station");
 
+        // Hide the chatbot placeholder
+        hideChatPlaceholder();
+        
         // Entferne alle bestehenden Marker vor dem Hinzufügen neuer
         clearMarkers();
 

@@ -157,7 +157,7 @@
         }
 
         .chat-form button[type="submit"] {
-            background-color: #00008b;
+            background-color: #0d203b;
             color: white;
         }
 
@@ -294,6 +294,28 @@
         .chat-option-button.light-blue:hover {
             background-color: #87ceeb; /* Slightly darker light blue on hover */
         }
+        .chat-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            height: 100%; /* Full height of the chat log */
+            color: gray;
+            opacity: 0.7; /* Make it less prominent */
+        }
+
+        .chat-placeholder img {
+            width: 150px; /* Adjust size of the chatbot image */
+            height: auto;
+            margin-bottom: 10px;
+        }
+
+        .chat-placeholder p {
+            font-size: 1.2em;
+            margin: 0;
+        }
+
 
     </style>
     <!-- Load Google Maps -->
@@ -327,7 +349,12 @@
         </div>
 
         <!-- Scrollable chat log -->
-        <div id="chat-log" class="chat-log"></div>
+        <div id="chat-log" class="chat-log">
+            <div id="chat-placeholder" class="chat-placeholder">
+                <img src="{{ url_for('static', filename='chatbot-avatar.png') }}" alt="Chatbot">
+                <p>I'm here to help! Type your message to get started.</p>
+            </div>
+        </div>
 
         <!-- Typing Indicator -->
         <div id="typing-indicator">Typing...</div>
