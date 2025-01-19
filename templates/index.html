@@ -186,10 +186,36 @@
             background-color: #45a049;
         }
 
+        #map-container {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            max-width: 800px; /* Matches the chat container's max width */
+            width: 90%; /* Responsive width for smaller screens */
+            margin: 0 auto; /* Centers the map container */
+        }
+
         #map {
-            width: 90%;
-            height: 500px;
-            margin: 20px 0;
+            width: 100%; /* Map takes up the full width of its container */
+            height: 500px; /* Consistent height for the map */
+            border: 1px solid #ddd; /* Optional: Adds a border for aesthetics */
+            border-radius: 8px; /* Optional: Rounds the map corners */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            #map {
+                height: 400px; /* Adjust the height for smaller devices */
+            }
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 768px) {
+            #map {
+                width: 100%; /* Map takes the full width on smaller screens */
+                height: 400px; /* Reduces the height for smaller devices */
+            }
         }
 
         .chat-options {
@@ -241,7 +267,9 @@
     </div>
 
     <!-- Google Maps Section -->
-    <div id="map"></div>
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
 
     <!-- SOS Contacts Modal -->
     <div id="modal">
