@@ -4,6 +4,12 @@ console.log("JavaScript ist geladen und funktioniert!");
 let map, directionsService, directionsRenderer, userLocation;
 let markers = []; // Liste für alle Marker
 
+// Helper function to scroll to the bottom of the chat log
+function scrollToBottom() {
+    const chatLog = document.getElementById("chat-log");
+    chatLog.scrollTo({ top: chatLog.scrollHeight, behavior: "smooth" });
+}
+
 // Entferne alle Marker von der Karte
 function clearMarkers() {
     markers.forEach((marker) => {
@@ -116,6 +122,9 @@ document.getElementById("chat-form").addEventListener("submit", async (event) =>
         userMessage.textContent = input;
         chatLog.appendChild(userMessage);
 
+        // Scroll to the bottom after adding the user message
+        scrollToBottom();
+
         document.getElementById("user-input").value = ""; // Clear input field
 
         console.log("Sending user input to backend...");
@@ -139,6 +148,8 @@ document.getElementById("chat-form").addEventListener("submit", async (event) =>
                 botMessage.className = "chat-message bot-message";
                 botMessage.textContent = data.response;
                 chatLog.appendChild(botMessage);
+                // Scroll to the bottom after adding the bot response
+                scrollToBottom();
             } else {
                 console.error("Error from backend:", response.status, response.statusText);
             }
