@@ -205,6 +205,9 @@ async function fetchClosestSafePlace(query) {
 
             chatLog.appendChild(botMessage);
 
+            // Scroll to the latest message
+            scrollToBottom();
+
             // Plot markers on the map
             data.places.forEach((place) => {
                 createMarker(place);

@@ -127,6 +127,16 @@
             opacity: 0.9;
         }
 
+        #chat-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 10px;
+            justify-content: center;
+            background-color: #f1f1f1; /* Light background for visibility */
+            border-bottom: 1px solid #ddd; /* Visual separation */
+        }
+
         #modal {
             display: none;
             position: fixed;
@@ -237,6 +247,16 @@
         .chat-option-button:hover {
             background-color: #007bb5;
         }
+        /* Lighter blue for the second row buttons */
+        .chat-option-button.light-blue {
+            background-color: #add8e6; /* Light blue color */
+            color: black; /* Adjust text color for contrast */
+        }
+
+        .chat-option-button.light-blue:hover {
+            background-color: #87ceeb; /* Slightly darker light blue on hover */
+        }
+
     </style>
     <!-- Load Google Maps -->
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3hP_MBMqhB_EdFo7ZIJMmNxWJYORrYXY&libraries=places,directions"></script>
@@ -248,23 +268,33 @@
     <!-- Chat Section -->
     <div id="chat-container">
         <div class="chat-header">How can I help you?</div>
-        <div id="chat-log" class="chat-log">
-            <!-- Predefined clickable items -->
-            <div class="chat-options">
-                <button class="chat-option-button" onclick="showSafePlaces()">Safe places nearby</button>
-                <button class="chat-option-button" onclick="showEmergencyContacts()">Emergency contacts</button>
-                <button class="chat-option-button" onclick="showSafetyProtocol()">Safety Protocol</button>
-                <button class="chat-option-button" onclick="fetchClosestSafePlace('restaurant')">Restaurants Nearby</button>
-                <button class="chat-option-button" onclick="fetchClosestSafePlace('shop')">Shops Nearby</button>
-                <button class="chat-option-button" onclick="fetchClosestSafePlace('police station')">Police Stations Nearby</button>
-            </div>
+
+        <!-- Predefined clickable buttons, outside #chat-log -->
+        <div id="chat-options" class="chat-options">
+            <!-- First Row -->
+            <button class="chat-option-button" onclick="showSafePlaces()">Safe places nearby</button>
+            <button class="chat-option-button" onclick="fetchClosestSafePlace('restaurant')">Restaurants Nearby</button>
+            <button class="chat-option-button" onclick="fetchClosestSafePlace('shop')">Shops Nearby</button>
+            <button class="chat-option-button" onclick="fetchClosestSafePlace('police station')">Police Stations Nearby</button>
+
+            <!-- Second Row -->
+            <button class="chat-option-button light-blue" onclick="showSafetyProtocol()">Safety Protocol</button>
+            <button class="chat-option-button light-blue" onclick="showEmergencyContacts()">Emergency Contacts</button>
         </div>
+
+        <!-- Scrollable chat log -->
+        <div id="chat-log" class="chat-log"></div>
+
+        <!-- Typing Indicator -->
         <div id="typing-indicator">Typing...</div>
+
+        <!-- Input form -->
         <form id="chat-form" class="chat-form">
             <input type="text" id="user-input" placeholder="Type your message..." required>
             <button type="submit">Send</button>
         </form>
     </div>
+
 
     <!-- Google Maps Section -->
     <div id="map-container">
