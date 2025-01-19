@@ -42,11 +42,11 @@ def api_chat():
             json={
                 "model": "gpt-3.5-turbo",
                 "messages": [
-                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "system", "content": "You are a safety chatbot that uses clear, supportive, and calm language to assist users in potentially unsafe situations."},
                     {"role": "user", "content": user_message},
                 ],
-                "max_tokens": 150,
-                "temperature": 0.7,
+                "max_tokens": 100, # Lower number of max token for quick & concise response
+                "temperature": 0.5, # lowered temperature for more coherent responses
             }
         )
 
