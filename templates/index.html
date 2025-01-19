@@ -3,9 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Logo" style="width: 150px; height: auto;">
     <title>Women's Security App</title>
     <style>
+
+    /* Header styles */
+    #header {
+        background-color: white; /* White background */
+        color: black; /* Black text */
+        width: 90%; /* Matches chat-container and map-container */
+        max-width: 800px; /* Maximum width */
+        margin: 0 auto 20px; /* Center header horizontally, add spacing below */
+        display: flex; /* Flexbox for layout */
+        align-items: center; /* Vertically center logo and text */
+        justify-content: center; /* Horizontally center the content */
+        padding: 20px; /* Increase padding for a larger header */
+        border-bottom: 1px solid #d3d3d3; /* Light gray border, thinner and subtler */
+    }
+
+    #header img {
+        height: 90px; /* Larger logo size */
+        margin-right: 20px; /* Spacing between logo and text */
+    }
+
+    #header h1 {
+        font-size: 1.8em; /* Slightly larger font size for the title */
+        margin: 0; /* Remove default margin */
+    }
+
+    #header p {
+        font-size: 1em; /* Normal font size for tagline */
+        margin: 0; /* Remove default margin */
+    }
+
+    /* Styling for text layout */
+    #header-text {
+        display: flex;
+        flex-direction: column; /* Stack title and tagline vertically */
+        align-items: center; /* Center align the text vertically */
+    }
+
+
+
         body {
             font-family: Arial, sans-serif;
             margin: 0;
@@ -262,8 +300,14 @@
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3hP_MBMqhB_EdFo7ZIJMmNxWJYORrYXY&libraries=places,directions"></script>
 </head>
 <body>
-    <h1>Women's Security App</h1>
-    <p>Feel Safe, Stay Safe</p>
+    <!-- Header Section -->
+    <div id="header">
+        <img src="{{ url_for('static', filename='logo.jpeg') }}" alt="Logo">
+        <div id="header-text">
+            <h1>Women's Security App</h1>
+            <p>Feel Safe, Stay Safe</p>
+        </div>
+    </div>
 
     <!-- Chat Section -->
     <div id="chat-container">
