@@ -46,7 +46,7 @@ def api_chat():
                     {"role": "user", "content": user_message},
                 ],
                 "max_tokens": 100, # Lower number of max token for quick & concise response
-                "temperature": 0.7, # lowered temperature for more coherent responses
+                "temperature": 0.8, # lowered temperature for more coherent responses
             }
         )
 

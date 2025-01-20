@@ -193,6 +193,9 @@ function showShopsNearby() {
     if (userLocation) {
         console.log("Fetching shops nearby");
 
+        // Hide the chatbot placeholder
+        hideChatPlaceholder();
+        
         // Entferne alte Marker
         clearMarkers();
 
@@ -347,6 +350,9 @@ async function fetchClosestSafePlace(query) {
             botMessage.textContent = placesMessage;
 
             chatLog.appendChild(botMessage);
+            
+            // Hide the chatbot placeholder
+            hideChatPlaceholder();
 
             // Scroll to the latest message
             scrollToBottom();
