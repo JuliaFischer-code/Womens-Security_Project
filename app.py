@@ -2,15 +2,19 @@ from flask import Flask, render_template, request, jsonify
 import requests
 import os
 import googlemaps  # Add this library (install with pip install -U googlemaps)
+from dotenv import load_dotenv  # Import dotenv to load environment variables
+
+# Load environment variables from .env
+load_dotenv()
 
 app = Flask(__name__)
 
 # OpenAI API setup
-OPENAI_API_KEY = "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"
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_BASE_URL = "https://api.openai.com/v1/chat/completions"
 
 # Google Maps API setup
-GOOGLE_MAPS_API_KEY = "AIzaSyA3hP_MBMqhB_EdFo7ZIJMmNxWJYORrYXY"  # Replace with your actual key
+GOOGLE_MAPS_API_KEY = os.getenv("GOOGLE_MAPS_API_KEY")
 gmaps = googlemaps.Client(key=GOOGLE_MAPS_API_KEY)
 
 @app.route("/")
