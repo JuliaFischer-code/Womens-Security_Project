@@ -67,6 +67,15 @@ def api_chat():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+    
+@app.route("/api/get-google-maps-key", methods=["GET"])
+def get_google_maps_key():
+    try:
+        # Return the API key securely
+        return jsonify({"google_maps_api_key": GOOGLE_MAPS_API_KEY})
+    except Exception as e:
+        return jsonify({"error": f"Failed to load the API key: {str(e)}"}), 500
+
 
 @app.route("/api/safe-places", methods=["POST"])
 def safe_places():

@@ -328,8 +328,27 @@
 
     </style>
     <!-- Load Google Maps -->
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA3hP_MBMqhB_EdFo7ZIJMmNxWJYORrYXY&libraries=places,directions"></script>
-</head>
+    <script>
+        // Fetch the Google Maps API key from the backend
+        fetch("/api/get-google-maps-key")
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.google_maps_api_key) {
+                    // Dynamically load the Google Maps script with the API key
+                    const script = document.createElement("script");
+                    script.src = `https://maps.googleapis.com/maps/api/js?key=${data.google_maps_api_key}&libraries=places,directions`;
+                    script.async = true;
+                    script.defer = true;
+                    document.head.appendChild(script);
+                } else {
+                    console.error("Failed to load Google Maps API key.");
+                }
+            })
+            .catch((error) => {
+                console.error("Error fetching Google Maps API key:", error);
+            });
+    </script>
+</head>7
 <body>
     <!-- Header Section -->
     <div id="header">
