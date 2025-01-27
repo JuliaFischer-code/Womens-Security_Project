@@ -363,7 +363,7 @@ async function fetchClosestSafePlace(query) {
             });
         } else {
             const error = await response.json();
-            const errorMessage = `Error fetching ${query}: ${error.error}`;
+            const errorMessage = `No open ${query} found around you.`;
 
             // Display error message in chatbox
             const chatLog = document.getElementById("chat-log");

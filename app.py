@@ -78,11 +78,18 @@ def safe_places():
         return jsonify({"error": "Location and query are required"}), 400
 
     try:
+        # Define exceptions where we do not apply the 'open_now' filter
+        no_open_now_queries = ["fire station"]
+
+        # Determine whether to use the 'open_now' filter
+        open_now_filter = query.lower() not in no_open_now_queries
+
         # Use Google Maps Places API to search for places nearby
         places_result = gmaps.places_nearby(
             location=(user_location["lat"], user_location["lng"]),
             radius=2000,  # 2 km radius
-            keyword=query  # Query for user-specified or combined keywords
+            keyword=query,  # Query for user-specified or combined keywords
+            open_now=open_now_filter # Only fetch open places only for relevant queries (firestation often dont have opening time)
         )
 
         if not places_result.get("results"):
