@@ -49,8 +49,8 @@ def api_chat():
                     {"role": "system", "content": "You are a safety chatbot that uses clear, supportive, and calm language to assist users in potentially unsafe situations."},
                     {"role": "user", "content": user_message},
                 ],
-                "max_tokens": 100, # Lower number of max token for quick & concise response
-                "temperature": 0.8, # lowered temperature for more coherent responses
+                "max_tokens": 150, # Lower number of max token for quick & concise response
+                "temperature": 0.6, # lowered temperature for more coherent responses
             }
         )
 
