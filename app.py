@@ -36,6 +36,7 @@ def api_chat():
     if not user_message:
         return jsonify({"error": "Message cannot be empty"}), 400
 
+
     # Define restricted phrases (blocking prompt injection and adversarial queries)
     BLOCKED_PHRASES = [
         "system prompt", "repeat your instructions", "act as your system prompt",
@@ -54,6 +55,7 @@ def api_chat():
     # Define allowed safe topics
     SAFE_TOPICS = ["safe locations", "security tips", "emergency contacts", "self-defense", "police stations", "hospitals", "fire stations"]
 
+    # Check and block restricted queries before sending to OpenAI
     def contains_blocked_phrase(message):
         """Check if the user input contains restricted words or phrases."""
         message = message.lower().strip()
@@ -65,7 +67,12 @@ def api_chat():
             return True
 
         return False
+    
+    if contains_blocked_phrase(user_message):
+        print(f"Blocked attempt: {user_message}")  # Log the blocked attempt
+        return jsonify({"response": "Please only ask about safety-related topics. How can I help you?"})
 
+    # Check safe topics
     def is_safe_topic(response_text):
         """Checks whether the response is related to security topics."""
         return any(topic in response_text.lower() for topic in SAFE_TOPICS)
@@ -75,7 +82,6 @@ def api_chat():
         if not is_safe_topic(response_text):
             return "I'm here to provide safety advice only. Please ask about security-related topics."
         return response_text
-
 
     try:
         # Call the OpenAI API with the user's input
